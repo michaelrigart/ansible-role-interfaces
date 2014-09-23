@@ -1,0 +1,5 @@
+{% for i in item.route %}
+ADDRESS{{ loop.index - 1  }}={{ i.network }}
+NETMASK{{ loop.index - 1 }}={{ i.netmask }}
+GATEWAY{{ loop.index - 1 }}={{ i.gateway }}
+{% endfor %}

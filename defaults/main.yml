@@ -1,0 +1,11 @@
+---
+
+interfaces_pkgs:
+  - python-selinux
+  - bridge-utils
+  - ifenslave-2.6
+interfaces_net_path: /etc/network/interfaces.d
+interfaces_pkg_state: installed
+interfaces_ether_interfaces: []
+interfaces_bridge_interfaces: []
+interfaces_bond_interfaces: []

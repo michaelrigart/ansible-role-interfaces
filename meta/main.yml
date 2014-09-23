@@ -1,0 +1,24 @@
+---
+galaxy_info:
+  author: Michaël Rigart
+  description: An ansible role for configuring different network interfaces.
+  company: Netronix.be
+  license: GPLv3
+  min_ansible_version: 1.6
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+    - name: EL
+      versions:
+        - all
+    - name: Fedora
+      versions:
+        - all
+  categories:
+    - system
+dependencies: []
+

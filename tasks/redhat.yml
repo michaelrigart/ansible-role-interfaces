@@ -1,0 +1,10 @@
+---
+
+- name: RedHat | install current/latest network packages versions
+  yum:
+    name: '{{ item }}'
+    state: '{{ interfaces_pkg_state }}'
+  with_items: interfaces_pkgs
+  tags: package
+
+

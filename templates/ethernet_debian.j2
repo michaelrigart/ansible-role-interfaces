@@ -1,0 +1,30 @@
+{% if item.bootproto == 'static' %}
+auto {{ item.device }}
+iface {{ item.device }}  inet static
+{% if item.address is defined %}
+address {{ item.address }}
+{% endif %}
+{% if item.netmask is defined %}
+netmask {{ item.netmask }}
+{% endif %}
+{% if item.gateway is defined %}
+gateway {{ item.gateway }}
+{% endif %}
+{% if item.dnsnameservers is defined %}
+dns-nameservers {{ item.dnsnameservers }}
+{% endif %}
+{% endif %}
+{% if item.dnssearch is defined %}
+dns-search {{ item.dnssearch }}
+{% endif %}
+
+{% if item.bootproto == 'dhcp' %}
+auto {{ item.device }}
+iface {{ item.device }}  inet dhcp
+{% endif %}
+
+{% if item.route is defined %}
+{% for i in item.route %}
+up route add -net {{ i.network }}  netmask {{ i.netmask }} gw {{ i.gateway }} dev {{ item.device }}
+{% endfor %}
+{% endif %}

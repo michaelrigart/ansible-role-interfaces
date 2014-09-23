@@ -1,0 +1,19 @@
+---
+
+- name: Create the network configuration file for ethernet devices
+  template:
+    src: 'ethernet_{{ ansible_os_family }}.j2'
+    dest: '{{ interfaces_net_path }}/ifcfg-{{ item.device }}'
+  with_items: interfaces_ether_interfaces
+  register: ether_result
+
+- name: RedHat | Write configuration files for rhel route configuration
+  template:
+    src: 'route_{{ ansible_os_family }}.j2'
+    dest: '{{ interfaces_net_path }}/route-{{ item.device }}'
+  with_items: network_ether_interfaces
+  when: item.route is defined and ansible_os_family == 'RedHat'
+
+- shell: 'ifdown {{ item.item.device }}; ifup {{ item.item.device }}'
+  with_items: ether_result.results
+  when: ether_result is defined and item.changed

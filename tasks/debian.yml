@@ -1,0 +1,25 @@
+---
+
+- name: Debian | install current/latest network packages versions
+  apt:
+    pkg: '{{ item }}'
+    state: '{{ interfaces_pkg_state }}'
+    update_cache: yes
+    cache_valid_time: 3600
+  with_items: interfaces_pkgs
+  tags: package
+
+- name: Debian | Copy new interfaces file to source interfaces.d
+  copy:
+    src: interfaces
+    dest: /etc/network/interfaces
+    owner: root
+    group: root
+    mode: 0644
+  tags: configuration
+
+- name: Debian | Create the directory for interface cfg files
+  file:
+    path: /etc/network/interfaces.d
+    state: directory
+  tags: configuration
