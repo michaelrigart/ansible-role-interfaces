@@ -6,7 +6,7 @@
     state: '{{ interfaces_pkg_state }}'
     update_cache: yes
     cache_valid_time: 3600
-  with_items: interfaces_pkgs
+  with_items: interfaces_pkgs['debian']
   tags: package
 
 - name: Debian | Copy new interfaces file to source interfaces.d
@@ -20,6 +20,6 @@
 
 - name: Debian | Create the directory for interface cfg files
   file:
-    path: /etc/network/interfaces.d
+    path: '{{ interfaces_net_path[ansible_os_family] }}'
     state: directory
   tags: configuration

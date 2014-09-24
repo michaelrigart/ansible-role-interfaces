@@ -3,14 +3,14 @@
 - name: Create the network configuration file for bridge devices
   template:
     src: 'bridge_{{ ansible_os_family }}.j2'
-    dest: '{{ interfaces_net_path }}/ifcfg-{{ item.device }}'
+    dest: '{{ interfaces_net_path[ansible_os_family] }}/ifcfg-{{ item.device }}'
   with_items: interfaces_bridge_interfaces
   register: bridge_result
 
 - name: Write configuration files for rhel route configuration
   template:
     src: 'route_{{ ansible_os_family }}.j2'
-    dest: '{{ interfaces_net_path }}/route-{{ item.device }}'
+    dest: '{{ interfaces_net_path[ansible_os_family] }}/route-{{ item.device }}'
   with_items: interfaces_bridge_interfaces
   when: item.route is defined and ansible_os_family == 'RedHat'
 
@@ -21,7 +21,7 @@
 - name: Create the network configuration file for port on the bridge devices
   template:
     src: 'bridge_port_{{ ansible_os_family }}.j2'
-    dest: '{{ interfaces_net_path }}/ifcfg-{{ item.1 }}'
+    dest: '{{ interfaces_net_path[ansible_os_family] }}/ifcfg-{{ item.1 }}'
   with_subelements:
     - interfaces_bridge_interfaces
     - ports
