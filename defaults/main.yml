@@ -5,7 +5,6 @@ interfaces_pkgs:
     - python-selinux
     - bridge-utils
     - ifenslave-2.6
-interfaces_pkgs:
   redhat:
     - libselinux-python
     - bridge-utils
