@@ -1,0 +1,12 @@
+---
+language: python
+python: "2.7"
+before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq python-apt python-pycurl
+install:
+  - pip install ansible==1.6.0
+script:
+  - ansible-playbook -i tests/inventory --syntax-check --list-tasks tests/test.yml -e "role_name=ansible-role-interfaces" -e "hosts_group=hosts_group"
+  - ansible-playbook -i tests/inventory tests/test.yml --connection=local --sudo
+  
