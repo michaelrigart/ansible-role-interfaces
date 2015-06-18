@@ -1,6 +1,6 @@
 Ansible Interfaces Role
 =======================
-[![Build Status](https://travis-ci.org/michaelrigart/ansible-role-interfaces.svg?branch=master)](https://travis-ci.org/michaelrigart/ansible-role-interfaces)
+[![Build Status](https://semaphoreci.com/api/v1/projects/9fbdbcca-8328-4b67-8950-53f2afde05cc/459458/badge.svg)](https://semaphoreci.com/michaelrigart/ansible-role-interfaces) [![Build Status](https://travis-ci.org/michaelrigart/ansible-role-interfaces.svg?branch=master)](https://travis-ci.org/michaelrigart/ansible-role-interfaces)
 
 An ansible role for configuring different network interfaces.
 
