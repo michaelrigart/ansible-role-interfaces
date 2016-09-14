@@ -22,13 +22,13 @@ them are as follows:
 
 ```yaml
 # The list of ethernet interfaces to be added to the system
-network_ether_interfaces: []
+interfaces_ether_interfaces: []
 
 # The list of bridge interfaces to be added to the system
-network_bridge_interfaces: []
+interfaces_bridge_interfaces: []
 
 # The list of bonded interfaces to be added to the system
-network_bond_interfaces: []
+interfaces_bond_interfaces: []
 ```
 
 Note: The values for the list are listed in the examples below.
@@ -40,7 +40,7 @@ define static routes and a gateway.
 - hosts: myhost
   roles:
     - role: network
-      network_ether_interfaces:
+      interfaces_ether_interfaces:
        - device: eth1
          bootproto: static
          address: 192.168.1.150
@@ -67,7 +67,7 @@ define static routes and a gateway.
 - hosts: myhost
   roles:
     - role: network
-      network_bridge_interfaces:
+      interfaces_bridge_interfaces:
        -  device: br1
           type: bridge
           address: 192.168.1.150
@@ -86,7 +86,7 @@ added for ethernet interfaces.
 - hosts: myhost
   roles:
     - role: network
-      network_bond_interfaces:
+      interfaces_bond_interfaces:
         - device: bond0
           address: 192.168.1.150
           netmask: 255.255.255.0
@@ -107,7 +107,7 @@ address obtained via DHCP.
 - hosts: myhost
   roles:
     - role: network
-      network_bond_interfaces:
+      interfaces_bond_interfaces:
         - device: bond0
           bootproto: dhcp
           bond_mode: 802.3ad
@@ -131,7 +131,7 @@ Describe your network configuration for each host in host vars:
 ### host_vars/host1
 
 ```yaml
-network_ether_interfaces:
+interfaces_ether_interfaces:
        - device: eth1
          bootproto: static
          address: 192.168.1.150
@@ -141,7 +141,7 @@ network_ether_interfaces:
           - network: 192.168.200.0
             netmask: 255.255.255.0
             gateway: 192.168.1.1
-network_bond_interfaces:
+interfaces_bond_interfaces:
         - device: bond0
           bootproto: dhcp
           bond_mode: 802.3ad
@@ -152,7 +152,7 @@ network_bond_interfaces:
 ### host_vars/host2
 
 ```yaml
-network_ether_interfaces:
+interfaces_ether_interfaces:
        - device: eth0
          bootproto: static
          address: 192.168.1.150
