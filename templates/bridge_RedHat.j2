@@ -27,3 +27,7 @@ BOOTPROTO=dhcp
 STP={{ item.stp }}
 {% endif %}
 {% endif %}
+
+{% if ansible_distribution_major_version | int >= 7 %}
+NM_CONTROLLED=no
+{% endif %}
