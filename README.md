@@ -13,7 +13,6 @@ unable to recover without physical access to the machine._
 - Bonded interfaces
 - Network routes
 
-
 Role Variables
 --------------
 
