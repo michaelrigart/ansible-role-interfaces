@@ -4,7 +4,7 @@
   yum:
     name: '{{ item }}'
     state: '{{ interfaces_pkg_state }}'
-  with_items: interfaces_pkgs['redhat']
+  with_items: '{{ interfaces_pkgs["redhat"] }}'
   tags: package
 
 
