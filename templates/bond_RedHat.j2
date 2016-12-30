@@ -24,3 +24,7 @@ USERCTL=no
 ONBOOT={{ item.onboot|default("yes") }}
 BOOTPROTO=dhcp
 {% endif %}
+
+{% if ansible_distribution_major_version | int >= 7 %}
+NM_CONTROLLED=no
+{% endif %}
