@@ -1,6 +1,5 @@
 Ansible Interfaces Role
 =======================
-[![Build Status](https://semaphoreci.com/api/v1/projects/9fbdbcca-8328-4b67-8950-53f2afde05cc/459458/badge.svg)](https://semaphoreci.com/michaelrigart/ansible-role-interfaces)
 
 An ansible role for configuring different network interfaces.
 
@@ -181,7 +180,7 @@ Example Playbook
 ```yaml
 - hosts: servers
   roles:
-     - { role: MichaelRigart.interfaces, sudo: Yes }
+     - { role: MichaelRigart.interfaces, become: true }
 ```
 License
 -------
