@@ -1,11 +1,8 @@
-{% if item.bootproto == 'static' %}
 DEVICE={{ item.device }}
+{% if item.bootproto == 'static' %}
 BOOTPROTO=none
 {% if item.address is defined %}
 IPADDR={{ item.address }}
-{% endif %}
-{% if item.onboot is defined %}
-ONBOOT={{ item.onboot }}
 {% endif %}
 {% if item.netmask is defined %}
 NETMASK={{ item.netmask }}
@@ -16,8 +13,11 @@ GATEWAY={{ item.gateway }}
 {% endif %}
 
 {% if item.bootproto == 'dhcp' %}
-DEVICE={{ item.device }}
 BOOTPROTO=dhcp
+{% endif %}
+
+{% if item.onboot is defined %}
+ONBOOT={{ item.onboot }}
 {% endif %}
 
 {% if ansible_distribution_major_version | int >= 7 %}
