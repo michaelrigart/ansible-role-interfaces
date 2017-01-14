@@ -1,5 +1,5 @@
-{% if item.bootproto == 'static' %}
 DEVICE={{ item.device }}
+{% if item.bootproto == 'static' %}
 TYPE=Bridge
 BOOTPROTO=none
 {% if item.stp is defined %}
@@ -20,7 +20,6 @@ GATEWAY={{ item.gateway }}
 {% endif %}
 
 {% if item.bootproto == 'dhcp' %}
-DEVICE={{ item.device }}
 TYPE=bridge
 BOOTPROTO=dhcp
 {% if item.stp is defined %}

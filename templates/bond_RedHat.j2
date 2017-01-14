@@ -1,5 +1,5 @@
-{% if item.bootproto == 'static' %}
 DEVICE={{ item.device }}
+{% if item.bootproto == 'static' %}
 USERCTL=no
 BOOTPROTO=none
 {% if item.address is defined %}
@@ -18,7 +18,6 @@ BONDING_OPTS="mode={{ item.bond_mode }} miimon={{ item.bond_miimon|default(100) 
 {% endif %}
 
 {% if item.bootproto == 'dhcp' %}
-DEVICE={{ item.device }}
 BONDING_OPTS="mode={{ item.bond_mode }} miimon={{ item.bond_miimon|default(100) }} "
 USERCTL=no
 ONBOOT={{ item.onboot|default("yes") }}

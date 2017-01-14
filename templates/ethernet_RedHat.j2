@@ -1,5 +1,5 @@
-{% if item.bootproto == 'static' %}
 DEVICE={{ item.device }}
+{% if item.bootproto == 'static' %}
 BOOTPROTO=none
 {% if item.address is defined %}
 IPADDR={{ item.address }}
@@ -16,7 +16,6 @@ GATEWAY={{ item.gateway }}
 {% endif %}
 
 {% if item.bootproto == 'dhcp' %}
-DEVICE={{ item.device }}
 BOOTPROTO=dhcp
 {% endif %}
 
