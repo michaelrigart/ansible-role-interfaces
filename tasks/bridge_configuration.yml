@@ -24,7 +24,7 @@
     src: 'bridge_port_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/ifcfg-{{ item.1 }}'
   with_subelements:
-    - interfaces_bridge_interfaces
+    - "{{ interfaces_bridge_interfaces }}"
     - ports
   register: bridge_port_result
 
