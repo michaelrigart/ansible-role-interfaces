@@ -3,6 +3,10 @@ TYPE=Ethernet
 BOOTPROTO=none
 BRIDGE={{ item.0.device }}
 
+{% if item.0.onboot is defined %}
+ONBOOT={{ item.0.onboot }}
+{% endif %}
+
 {% if ansible_distribution_major_version | int >= 7 %}
 NM_CONTROLLED=no
 {% endif %}
