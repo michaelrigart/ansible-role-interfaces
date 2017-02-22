@@ -4,7 +4,7 @@ interfaces_pkgs:
   debian:
     - python-selinux
     - bridge-utils
-    - ifenslave-2.6
+    - ifenslave
   redhat:
     - libselinux-python
     - bridge-utils
