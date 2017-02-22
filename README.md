@@ -86,6 +86,7 @@ added for ethernet interfaces.
     - role: network
       interfaces_bond_interfaces:
         - device: bond0
+          mtu: 9000
           address: 192.168.1.150
           netmask: 255.255.255.0
           bootproto: static
@@ -110,6 +111,9 @@ address obtained via DHCP.
           bootproto: dhcp
           bond_mode: 802.3ad
           bond_miimon: 100
+          bond_downdelay: 200
+          bond_updelay: 200
+          bond_xmit_hash_policy: layer3+4
           bond_slaves: [eth1, eth2]
 ```
 
@@ -141,6 +145,7 @@ interfaces_ether_interfaces:
             gateway: 192.168.1.1
 interfaces_bond_interfaces:
         - device: bond0
+          mtu: 9000
           bootproto: dhcp
           bond_mode: 802.3ad
           bond_miimon: 100
