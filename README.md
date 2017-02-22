@@ -45,8 +45,8 @@ define static routes and a gateway.
          netmask: 255.255.255.0
          gateway: 192.168.1.1
          network: 192.168.1.1
-         dns-servers: 8.8.8.8 8.8.4.4
-         dns-search: myhost.com
+         dnsnameservers: 8.8.8.8 8.8.4.4
+         dnssearch: myhost.com
 
          route:
           - network: 192.168.200.0
