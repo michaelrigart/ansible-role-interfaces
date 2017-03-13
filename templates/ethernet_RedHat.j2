@@ -23,3 +23,7 @@ ONBOOT={{ item.onboot }}
 {% if ansible_distribution_major_version | int >= 7 %}
 NM_CONTROLLED=no
 {% endif %}
+
+{% if item.device | match('.*\.\d{1,4}') %}
+VLAN=yes
+{% endif %}
