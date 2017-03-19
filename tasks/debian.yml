@@ -10,8 +10,8 @@
   tags: package
 
 - name: Debian | Copy new interfaces file to source interfaces.d
-  copy:
-    src: interfaces
+  template:
+    src: interfaces.j2
     dest: /etc/network/interfaces
     owner: root
     group: root

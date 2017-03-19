@@ -1,6 +1,9 @@
 {% if item.bootproto == 'static' %}
 auto {{ item.device }}
-iface {{ item.device }}  inet static
+iface {{ item.device }} inet static
+{% if item.mtu is defined %}
+mtu {{ item.mtu }}
+{% endif %}
 {% if item.address is defined %}
 address {{ item.address }}
 {% endif %}
@@ -20,11 +23,11 @@ dns-search {{ item.dnssearch }}
 
 {% if item.bootproto == 'dhcp' %}
 auto {{ item.device }}
-iface {{ item.device }}  inet dhcp
+iface {{ item.device }} inet dhcp
 {% endif %}
 
 {% if item.route is defined %}
 {% for i in item.route %}
-up route add -net {{ i.network }}  netmask {{ i.netmask }} gw {{ i.gateway }} dev {{ item.device }}
+up route add -net {{ i.network }} netmask {{ i.netmask }} gw {{ i.gateway }} dev {{ item.device }}
 {% endfor %}
 {% endif %}

@@ -1,6 +1,9 @@
 auto {{ item.device }}
 {% if item.bootproto == 'static' %}
 iface {{ item.device }} inet static
+{% if item.mtu is defined %}
+mtu {{ item.mtu }}
+{% endif %}
 {% if item.address is defined %}
 address {{ item.address }}
 {% endif %}
@@ -19,7 +22,7 @@ bridge_stp {{ item.stp }}
 {% endif %}
 
 {% if item.bootproto == 'dhcp' %}
-iface {{ item.device }}  inet dhcp
+iface {{ item.device }} inet dhcp
 {% if item.ports is defined %}
 bridge_ports {{ item.port }}
 {% endif %}
@@ -30,6 +33,6 @@ bridge_stp {{ item.stp }}
 
 {% if item.route is defined %}
 {% for i in item.route %}
-up route add -net {{ i.network }}  netmask {{ i.netmask }} gw {{ i.gateway }} dev {{ item.device }}
+up route add -net {{ i.network }} netmask {{ i.netmask }} gw {{ i.gateway }} dev {{ item.device }}
 {% endfor %}
 {% endif %}
