@@ -1,9 +1,9 @@
 {% if item.bootproto == 'static' %}
 auto {{ item.device }}
 iface {{ item.device }} inet static
-    {% if item.wpaconf is defined %}
-    wpa-conf {{ item.wpaconf }}
-    {% endif %}
+{% if item.wpaconf is defined %}
+wpa-conf {{ item.wpaconf }}
+{% endif %}
 {% if item.mtu is defined %}
 mtu {{ item.mtu }}
 {% endif %}
@@ -28,9 +28,9 @@ dns-search {{ item.dnssearch }}
 {% if item.bootproto == 'dhcp' %}
 auto {{ item.device }}
 iface {{ item.device }} inet dhcp
-    {% if item.wpaconf is defined %}
-    wpa-conf {{ item.wpaconf }}
-    {% endif %}
+{% if item.wpaconf is defined %}
+wpa-conf {{ item.wpaconf }}
+{% endif %}
 {% endif %}
 
 {% if item.route is defined %}
