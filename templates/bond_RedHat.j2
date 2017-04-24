@@ -27,3 +27,7 @@ BOOTPROTO=dhcp
 {% if ansible_distribution_major_version | int >= 7 %}
 NM_CONTROLLED=no
 {% endif %}
+
+{% if item.mtu is defined %}
+MTU={{ item.mtu }}
+{% endif %}

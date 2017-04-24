@@ -27,3 +27,7 @@ NM_CONTROLLED=no
 {% if item.device | match('.*\.\d{1,4}') %}
 VLAN=yes
 {% endif %}
+
+{% if item.mtu is defined %}
+MTU={{ item.mtu }}
+{% endif %}

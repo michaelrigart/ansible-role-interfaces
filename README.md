@@ -47,6 +47,7 @@ define static routes and a gateway.
          network: 192.168.1.1
          dnsnameservers: 192.0.2.1 192.0.2.2
          dnssearch: example.com
+         mtu: 9000
 
          route:
           - network: 192.168.200.0
@@ -72,6 +73,7 @@ define static routes and a gateway.
           netmask: 255.255.255.0
           bootproto: static
           stp: "on"
+          mtu: 1500
           ports: [eth1, eth2]
 ```
 
