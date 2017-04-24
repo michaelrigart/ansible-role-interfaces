@@ -14,11 +14,6 @@
   with_items: '{{ interfaces_bridge_interfaces }}'
   when: item.route is defined and ansible_os_family == 'RedHat'
 
-- name: Bounce bridge devices
-  shell: 'ifdown {{ item.item.device }}; ifup {{ item.item.device }}'
-  with_items: '{{ bridge_result.results }}'
-  when: bridge_result is defined and item.changed
-
 - name: Create the network configuration file for port on the bridge devices
   template:
     src: 'bridge_port_{{ ansible_os_family }}.j2'
@@ -28,7 +23,27 @@
     - ports
   register: bridge_port_result
 
-- name: Bounce bridge port devices
-  shell: 'ifdown {{ item.item.1 }}; ifup {{ item.item.1 }}'
-  with_items: '{{ bridge_port_result.results }}'
-  when: bridge_port_result is defined and item.changed
+# In some cases we might find that bouncing the bridge separately from its
+# ports can cause us to lose connectivity. This might be because the bridge is
+# being an assigned an IP that was previously assigned to one of the ports, or
+# because bringing up the bridge adds a default route that is not accessible
+# while the ports are inactive or detached from the bridge. This rather
+# complicated task will bounce each bridge device if it has changed, and any
+# ports connected to it if they have changed.
+- name: Bounce bridge and port devices
+  shell: >
+    {% if item.changed %}
+    ifdown {{ item.item.device }}; ifup {{ item.item.device }} ;
+    {% endif %}
+    {% for port_result in bridge_port_result.results | selectattr('changed') | selectattr('item.0.device', 'equalto', item.item.device) %}
+    ifdown {{ port_result.item.1 }} ; ifup {{ port_result.item.1 }} ;
+    {% endfor %}
+  with_items: '{{ bridge_result.results }}'
+  when:
+    - bridge_result is defined
+    # The long expression here is selecting the port results that changed and
+    # correspond to the bridge in question. We use the 'device' attribute to
+    # match because the with_subelements loop removes the subelement attribute
+    # (in this case 'ports') from each item.
+    - item.changed or
+      bridge_port_result.results | selectattr('changed') | selectattr('item.0.device', 'equalto', item.item.device) | list | length > 0
