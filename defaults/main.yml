@@ -5,6 +5,7 @@ interfaces_pkgs:
     - python-selinux
     - bridge-utils
     - ifenslave
+    - resolvconf
   redhat:
     - libselinux-python
     - bridge-utils
