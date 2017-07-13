@@ -44,7 +44,6 @@ define static routes and a gateway.
          address: 192.168.1.150
          netmask: 255.255.255.0
          gateway: 192.168.1.1
-         network: 192.168.1.1
          dnsnameservers: 192.0.2.1 192.0.2.2
          dnssearch: example.com
          mtu: 9000
