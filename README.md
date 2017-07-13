@@ -37,7 +37,7 @@ define static routes and a gateway.
 ```yaml
 - hosts: myhost
   roles:
-    - role: network
+    - role: MichaelRigart.interfaces
       interfaces_ether_interfaces:
        - device: eth1
          bootproto: static
@@ -65,7 +65,7 @@ define static routes and a gateway.
 ```yaml
 - hosts: myhost
   roles:
-    - role: network
+    - role: MichaelRigart.interfaces
       interfaces_bridge_interfaces:
        -  device: br1
           type: bridge
@@ -85,7 +85,7 @@ added for ethernet interfaces.
 ```yaml
 - hosts: myhost
   roles:
-    - role: network
+    - role: MichaelRigart.interfaces
       interfaces_bond_interfaces:
         - device: bond0
           mtu: 9000
@@ -107,7 +107,7 @@ address obtained via DHCP.
 ```yaml
 - hosts: myhost
   roles:
-    - role: network
+    - role: MichaelRigart.interfaces
       interfaces_bond_interfaces:
         - device: bond0
           bootproto: dhcp
@@ -172,7 +172,7 @@ and routed updated.
 ```yaml
 - hosts: all
   roles:
-    - role: network
+    - role: MichaelRigart.interfaces
 ```
 
 Note: Ansible needs network connectivity throughout the playbook process, you
