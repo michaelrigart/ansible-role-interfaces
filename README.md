@@ -37,18 +37,16 @@ define static routes and a gateway.
 ```yaml
 - hosts: myhost
   roles:
-    - role: network
+    - role: MichaelRigart.interfaces
       interfaces_ether_interfaces:
        - device: eth1
          bootproto: static
          address: 192.168.1.150
          netmask: 255.255.255.0
          gateway: 192.168.1.1
-         network: 192.168.1.1
          dnsnameservers: 192.0.2.1 192.0.2.2
          dnssearch: example.com
          mtu: 9000
-
          route:
           - network: 192.168.200.0
             netmask: 255.255.255.0
@@ -65,7 +63,7 @@ define static routes and a gateway.
 ```yaml
 - hosts: myhost
   roles:
-    - role: network
+    - role: MichaelRigart.interfaces
       interfaces_bridge_interfaces:
        -  device: br1
           type: bridge
@@ -85,7 +83,7 @@ added for ethernet interfaces.
 ```yaml
 - hosts: myhost
   roles:
-    - role: network
+    - role: MichaelRigart.interfaces
       interfaces_bond_interfaces:
         - device: bond0
           mtu: 9000
@@ -107,7 +105,7 @@ address obtained via DHCP.
 ```yaml
 - hosts: myhost
   roles:
-    - role: network
+    - role: MichaelRigart.interfaces
       interfaces_bond_interfaces:
         - device: bond0
           bootproto: dhcp
@@ -136,33 +134,33 @@ Describe your network configuration for each host in host vars:
 
 ```yaml
 interfaces_ether_interfaces:
-       - device: eth1
-         bootproto: static
-         address: 192.168.1.150
-         netmask: 255.255.255.0
-         gateway: 192.168.1.1
-         route:
-          - network: 192.168.200.0
-            netmask: 255.255.255.0
-            gateway: 192.168.1.1
+  - device: eth1
+    bootproto: static
+    address: 192.168.1.150
+    netmask: 255.255.255.0
+    gateway: 192.168.1.1
+    route:
+     - network: 192.168.200.0
+       netmask: 255.255.255.0
+       gateway: 192.168.1.1
 interfaces_bond_interfaces:
-        - device: bond0
-          mtu: 9000
-          bootproto: dhcp
-          bond_mode: 802.3ad
-          bond_miimon: 100
-          bond_slaves: [eth2, eth3]
+  - device: bond0
+    mtu: 9000
+    bootproto: dhcp
+    bond_mode: 802.3ad
+    bond_miimon: 100
+    bond_slaves: [eth2, eth3]
 ```
 
 ### host_vars/host2
 
 ```yaml
 interfaces_ether_interfaces:
-       - device: eth0
-         bootproto: static
-         address: 192.168.1.150
-         netmask: 255.255.255.0
-         gateway: 192.168.1.1
+  - device: eth0
+    bootproto: static
+    address: 192.168.1.150
+    netmask: 255.255.255.0
+    gateway: 192.168.1.1
 ```
 
 Create a playbook which applies this role to all hosts as shown below, and run
@@ -172,7 +170,7 @@ and routed updated.
 ```yaml
 - hosts: all
   roles:
-    - role: network
+    - role: MichaelRigart.interfaces
 ```
 
 Note: Ansible needs network connectivity throughout the playbook process, you
