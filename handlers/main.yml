@@ -1,4 +1,158 @@
 ---
+# NOTE: Handlers are executed in the order in which they are defined, not the
+# order in which they are notified.
 
-- name: restart networking
-  service: name=networking state=restarted
+- name: Make sure the bonding module is loaded
+  modprobe:
+    name: bonding
+    state: present
+
+# We need to bounce the changed network interfaces carefully, as some
+# interfaces may depend on others. Here are the possible dependencies between
+# interface types (X -> Y means X depends on Y):
+# Ethernet (VLAN) -> Ethernet
+# Ethernet (VLAN) -> bond
+# Ethernet (VLAN) -> bridge
+# Bond slave -> bond master
+# Bond slave (VLAN) -> Ethernet
+# Bond slave (VLAN) -> bridge(?)
+# Bridge port -> bridge
+# Bridge port (VLAN) -> Ethernet
+# Bridge port (VLAN) -> bond
+# Bridge port (VLAN) -> bridge
+#
+# This generates a number of valid orderings. We'll go with this one:
+# - Ethernet (non VLAN)
+# - Bridge
+# - Bond master
+# - Bridge port
+# - Bond slave
+# - Ethernet (VLAN)
+#
+# Also, use nohup to ensure the process survives termination of the SSH
+# connection.
+
+- name: Bounce network devices
+  command: >
+    nohup bash -c "
+    returncode=0
+    {% for interface in all_interfaces_changed | reverse %}
+    ifdown {{ interface }};
+    {% endfor %}
+
+    {% for interface in all_interfaces_changed %}
+    if ! ifup {{ interface }}; then
+      echo \"Failed to bring up interface {{ interface }}\";
+      returncode=1
+    fi;
+    {% endfor %}
+
+    exit $returncode"
+  vars:
+    vlan_regex: '.*\.\d{1,4}'
+    ether_vlan_interfaces_changed: >
+      {{ ether_interfaces_changed | select('match', vlan_regex) | list}}
+    ether_non_vlan_interfaces_changed: >
+      {{ ether_interfaces_changed | reject('match', vlan_regex) | list }}
+    all_interfaces_changed_default: >
+      {{ ether_non_vlan_interfaces_changed +
+         bridge_interfaces_changed +
+         bond_master_interfaces_changed +
+         bridge_port_interfaces_changed +
+         bond_slave_interfaces_changed +
+         ether_vlan_interfaces_changed }}
+    all_interfaces_changed_map:
+      Debian: "{{ all_interfaces_changed_default }}"
+      # On RedHat, bounce any changed bond master interfaces for a second time.
+      # The reason for this is unclear.
+      RedHat: >
+        {{ all_interfaces_changed_default +
+           bond_master_interfaces_changed }}
+    all_interfaces_changed: "{{ all_interfaces_changed_map[ansible_os_family] }}"
+  notify:
+    - Gather facts
+    - Verify network interfaces exist
+    - Verify network interfaces are active
+    - Verify network interface IP configuration
+    - Verify bond interface slaves
+    - Verify bridge interface ports
+
+# Update host facts so that we can verify the configuration has been applied
+# correctly.
+- name: Gather facts
+  setup:
+
+- name: Verify network interfaces exist
+  fail:
+    msg: >
+      Network interface {{ item }} does not exist.
+  with_flattened:
+    - "{{ ether_interfaces_changed }}"
+    - "{{ bridge_interfaces_changed }}"
+    - "{{ bond_master_interfaces_changed }}"
+    - "{{ bridge_port_interfaces_changed }}"
+    - "{{ bond_slave_interfaces_changed }}"
+  when: "'ansible_' ~ (item | replace('-', '_')) not in hostvars[inventory_hostname]"
+
+- name: Verify network interfaces are active
+  fail:
+    msg: >
+      Network interface {{ item }} is not active.
+  with_flattened:
+    - "{{ ether_interfaces_changed }}"
+    - "{{ bridge_interfaces_changed }}"
+    - "{{ bond_master_interfaces_changed }}"
+    - "{{ bridge_port_interfaces_changed }}"
+    - "{{ bond_slave_interfaces_changed }}"
+  when: not hostvars[inventory_hostname]['ansible_' ~ item | replace('-', '_')].active
+
+- name: Verify network interface IP configuration
+  fail:
+    msg: >
+      Unexpected IP configuration for interface {{ item.device }}.
+  with_flattened:
+    - "{{ interfaces_ether_interfaces }}"
+    - "{{ interfaces_bond_interfaces }}"
+    - "{{ interfaces_bridge_interfaces }}"
+  when:
+    - item.device in interfaces_changed
+    - item.bootproto | default == 'static'
+    - "'address' in item"
+    - item.address != '0.0.0.0'
+    - interface_fact.ipv4.address | default != item.address or
+      interface_fact.ipv4.netmask | default != item.netmask
+  vars:
+    interface_fact: >
+      {{ hostvars[inventory_hostname]['ansible_' ~ item.device | replace('-', '_')] }}
+    interfaces_changed: >
+      {{ ether_interfaces_changed +
+         bond_master_interfaces_changed +
+         bridge_interfaces_changed }}
+
+- name: Verify bond interface slaves
+  fail:
+    msg: >
+      Interface {{ item.1 }} is not a slave of bond {{ item.0.device }}.
+  with_subelements:
+    - "{{ interfaces_bond_interfaces }}"
+    - "bond_slaves"
+  when:
+    - item.1 in bond_slave_interfaces_changed
+    - item.1 not in interface_fact.slaves | default([])
+  vars:
+    interface_fact: >
+      {{ hostvars[inventory_hostname]['ansible_' ~ item.0.device | replace('-', '_')] }}
+
+- name: Verify bridge interface ports
+  fail:
+    msg: >
+      Interface {{ item.1 }} is not a port on bridge {{ item.0.device }}.
+  with_subelements:
+    - "{{ interfaces_bridge_interfaces }}"
+    - "ports"
+  when:
+    - item.0.device in bridge_interfaces_changed
+    - item.1 not in interface_fact.interfaces | default([])
+  vars:
+    interface_fact: >
+      {{ hostvars[inventory_hostname]['ansible_' ~ item.0.device | replace('-', '_')] }}
