@@ -36,6 +36,9 @@
   with_subelements:
     - "{{ interfaces_bridge_interfaces }}"
     - ports
+  # Don't configure bridge ports that are bonds here - they will have been
+  # configured by the bond tasks.
+  when: item.1 not in interfaces_bond_interfaces | map(attribute='device') | list
   register: bridge_port_result
   notify:
     - Bounce network devices

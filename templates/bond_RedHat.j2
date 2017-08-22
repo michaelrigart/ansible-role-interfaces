@@ -31,3 +31,9 @@ NM_CONTROLLED=no
 {% if item.mtu is defined %}
 MTU={{ item.mtu }}
 {% endif %}
+
+{% for bridge in interfaces_bridge_interfaces %}
+{% if item.device in bridge.ports %}
+BRIDGE={{ bridge.device }}
+{% endif %}
+{% endfor %}
