@@ -67,15 +67,14 @@
 
     exit $returncode"
   vars:
-    vlan_regex: '.*\.\d{1,4}'
     ether_vlan_interfaces_changed: >
-      {{ ether_interfaces_changed | select('match', vlan_regex) | list}}
+      {{ ether_interfaces_changed | select('match', vlan_interface_regex) | list}}
     ether_non_vlan_interfaces_changed: >
-      {{ ether_interfaces_changed | reject('match', vlan_regex) | list }}
+      {{ ether_interfaces_changed | reject('match', vlan_interface_regex) | list }}
     bridge_port_vlan_interfaces_changed: >
-      {{ bridge_port_interfaces_changed | select('match', vlan_regex) | list}}
+      {{ bridge_port_interfaces_changed | select('match', vlan_interface_regex) | list}}
     bridge_port_non_vlan_interfaces_changed: >
-      {{ bridge_port_interfaces_changed | reject('match', vlan_regex) | list }}
+      {{ bridge_port_interfaces_changed | reject('match', vlan_interface_regex) | list }}
     all_interfaces_changed_map:
       Debian: >
         {{ ether_non_vlan_interfaces_changed +

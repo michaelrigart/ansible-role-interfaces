@@ -24,7 +24,7 @@ ONBOOT={{ item.onboot }}
 NM_CONTROLLED=no
 {% endif %}
 
-{% if item.device | match('.*\.\d{1,4}') %}
+{% if item.device | match(vlan_interface_regex) %}
 VLAN=yes
 {% endif %}
 

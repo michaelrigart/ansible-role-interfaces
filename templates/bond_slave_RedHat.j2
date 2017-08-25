@@ -5,7 +5,7 @@ ONBOOT=yes
 SLAVE=yes
 USERCTL=no
 
-{% if item.1 | match('.*\.\d{1,4}') %}
+{% if item.1 | match(vlan_interface_regex) %}
 VLAN=yes
 {% endif %}
 
