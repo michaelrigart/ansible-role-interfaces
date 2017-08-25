@@ -146,8 +146,12 @@
     - item.bootproto | default == 'static'
     - "'address' in item"
     - item.address != '0.0.0.0'
-    - interface_fact.ipv4.address | default != item.address or
-      interface_fact.ipv4.netmask | default != item.netmask
+    - >
+      'ipv4' not in interface_fact or
+      'address' not in interface_fact.ipv4 or
+      interface_fact.ipv4.address != item.address or
+      'netmask' not in interface_fact.ipv4 or
+      interface_fact.ipv4.netmask != item.netmask
   vars:
     interface_fact: >
       {{ hostvars[inventory_hostname]['ansible_' ~ item.device | replace('-', '_')] }}
