@@ -6,13 +6,28 @@
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/ifcfg-{{ item.device }}'
   with_items: '{{ interfaces_bridge_interfaces }}'
   register: bridge_result
+  notify:
+    - Bounce network devices
 
-- name: Write configuration files for rhel route configuration
+- name: RedHat | Write configuration files for rhel route configuration
   template:
     src: 'route_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/route-{{ item.device }}'
   with_items: '{{ interfaces_bridge_interfaces }}'
   when: item.route is defined and ansible_os_family == 'RedHat'
+  register: bridge_route_add_result
+  notify:
+    - Bounce network devices
+
+- name: RedHat | Remove configuration files for rhel route configuration
+  file:
+    path: '{{ interfaces_net_path[ansible_os_family|lower] }}/route-{{ item.device }}'
+    state: absent
+  with_items: '{{ interfaces_bridge_interfaces }}'
+  when: item.route is not defined and ansible_os_family == 'RedHat'
+  register: bridge_route_del_result
+  notify:
+    - Bounce network devices
 
 - name: Create the network configuration file for port on the bridge devices
   template:
@@ -21,29 +36,38 @@
   with_subelements:
     - "{{ interfaces_bridge_interfaces }}"
     - ports
+  # Don't configure bridge ports that are bonds here - they will have been
+  # configured by the bond tasks.
+  when: item.1 not in interfaces_bond_interfaces | map(attribute='device') | list
   register: bridge_port_result
+  notify:
+    - Bounce network devices
 
-# In some cases we might find that bouncing the bridge separately from its
-# ports can cause us to lose connectivity. This might be because the bridge is
-# being an assigned an IP that was previously assigned to one of the ports, or
-# because bringing up the bridge adds a default route that is not accessible
-# while the ports are inactive or detached from the bridge. This rather
-# complicated task will bounce each bridge device if it has changed, and any
-# ports connected to it if they have changed.
-- name: Bounce bridge and port devices
-  shell: >
-    {% if item.changed %}
-    ifdown {{ item.item.device }}; ifup {{ item.item.device }} ;
-    {% endif %}
-    {% for port_result in bridge_port_result.results | selectattr('changed') | selectattr('item.0.device', 'equalto', item.item.device) %}
-    ifdown {{ port_result.item.1 }} ; ifup {{ port_result.item.1 }} ;
-    {% endfor %}
-  with_items: '{{ bridge_result.results }}'
-  when:
-    - bridge_result is defined
-    # The long expression here is selecting the port results that changed and
-    # correspond to the bridge in question. We use the 'device' attribute to
-    # match because the with_subelements loop removes the subelement attribute
-    # (in this case 'ports') from each item.
-    - item.changed or
-      bridge_port_result.results | selectattr('changed') | selectattr('item.0.device', 'equalto', item.item.device) | list | length > 0
+- name: Set a fact  containing all bridge results
+  set_fact:
+    # Build a list of all bridge results.
+    all_bridge_results: >
+      {{ bridge_result.results | default([]) +
+         bridge_route_add_result.results | default([]) +
+         bridge_route_del_result.results | default([]) }}
+
+# bridge_interfaces_changed and bridge_port_interfaces_changed are used in the
+# 'Bounce network devices' handler.
+- name: Set facts containing changed bridge and bridge port devices
+  set_fact:
+    # Select those tasks which changed, and map to a list of the corresponding
+    # bridge devices.
+    bridge_interfaces_changed: >
+      {{ all_bridge_results |
+         select('changed') |
+         map(attribute='item.device') |
+         unique |
+         list }}
+    # Select those tasks which changed, and map to a list of the corresponding
+    # bridge port devices.
+    bridge_port_interfaces_changed: >
+      {{ bridge_port_result.results |
+         select('changed') |
+         map(attribute='item.1') |
+         unique |
+         list }}
