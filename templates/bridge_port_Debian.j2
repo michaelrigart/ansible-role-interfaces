@@ -1,2 +1,5 @@
 auto {{ item.1 }}
 iface {{ item.1 }}  inet manual
+{% if item.1 | match(vlan_interface_regex) %}
+vlan-raw-device {{ item.1 | regex_replace(vlan_interface_suffix_regex, '') }}
+{% endif %}

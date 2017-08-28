@@ -8,25 +8,43 @@
     state: present
 
 # We need to bounce the changed network interfaces carefully, as some
-# interfaces may depend on others. Here are the possible dependencies between
-# interface types (X -> Y means X depends on Y):
+# interfaces may depend on others. To further complicate matters, the
+# dependencies are different between RedHat and Debian systems. Here are the
+# possible dependencies between interface types (X -> Y means X depends on Y):
+#
 # Ethernet (VLAN) -> Ethernet
-# Ethernet (VLAN) -> bond
+# Ethernet (VLAN) -> bond master
 # Ethernet (VLAN) -> bridge
-# Bond slave -> bond master
+# [RedHat] Bond master -> bridge
+# [RedHat] Bond slave -> bond master
+# [Debian] Bond master -> bond slave
 # Bond slave (VLAN) -> Ethernet
-# Bond slave (VLAN) -> bridge(?)
-# Bridge port -> bridge
+# [RedHat] bridge port -> bridge
+# [Debian] bridge -> bridge port
+# [Debian] bridge -> bond master
 # Bridge port (VLAN) -> Ethernet
-# Bridge port (VLAN) -> bond
+# Bridge port (VLAN) -> bond master
 # Bridge port (VLAN) -> bridge
 #
-# This generates a number of valid orderings. We'll go with this one:
+# Note that VLAN interfaces as bond slaves do not appear to work on Debian.
+#
+# This generates a number of valid orderings. For RedHat, we'll go with this
+# one:
 # - Ethernet (non VLAN)
 # - Bridge
 # - Bond master
 # - Bridge port
 # - Bond slave
+# - Ethernet (VLAN)
+#
+# And for Debian, this one:
+#
+# - Ethernet (non VLAN)
+# - Bond slave
+# - Bond master
+# - Bridge port (non VLAN)
+# - Bridge
+# - Bridge port (VLAN)
 # - Ethernet (VLAN)
 #
 # Also, use nohup to ensure the process survives termination of the SSH
@@ -49,24 +67,32 @@
 
     exit $returncode"
   vars:
-    vlan_regex: '.*\.\d{1,4}'
     ether_vlan_interfaces_changed: >
-      {{ ether_interfaces_changed | select('match', vlan_regex) | list}}
+      {{ ether_interfaces_changed | select('match', vlan_interface_regex) | list}}
     ether_non_vlan_interfaces_changed: >
-      {{ ether_interfaces_changed | reject('match', vlan_regex) | list }}
-    all_interfaces_changed_default: >
-      {{ ether_non_vlan_interfaces_changed +
-         bridge_interfaces_changed +
-         bond_master_interfaces_changed +
-         bridge_port_interfaces_changed +
-         bond_slave_interfaces_changed +
-         ether_vlan_interfaces_changed }}
+      {{ ether_interfaces_changed | reject('match', vlan_interface_regex) | list }}
+    bridge_port_vlan_interfaces_changed: >
+      {{ bridge_port_interfaces_changed | select('match', vlan_interface_regex) | list}}
+    bridge_port_non_vlan_interfaces_changed: >
+      {{ bridge_port_interfaces_changed | reject('match', vlan_interface_regex) | list }}
     all_interfaces_changed_map:
-      Debian: "{{ all_interfaces_changed_default }}"
+      Debian: >
+        {{ ether_non_vlan_interfaces_changed +
+           bond_slave_interfaces_changed +
+           bond_master_interfaces_changed +
+           bridge_port_non_vlan_interfaces_changed +
+           bridge_interfaces_changed +
+           bridge_port_vlan_interfaces_changed +
+           ether_vlan_interfaces_changed }}
       # On RedHat, bounce any changed bond master interfaces for a second time.
       # The reason for this is unclear.
       RedHat: >
-        {{ all_interfaces_changed_default +
+        {{ ether_non_vlan_interfaces_changed +
+           bridge_interfaces_changed +
+           bond_master_interfaces_changed +
+           bridge_port_interfaces_changed +
+           bond_slave_interfaces_changed +
+           ether_vlan_interfaces_changed +
            bond_master_interfaces_changed }}
     all_interfaces_changed: "{{ all_interfaces_changed_map[ansible_os_family] }}"
   notify:
@@ -119,8 +145,12 @@
     - item.bootproto | default == 'static'
     - "'address' in item"
     - item.address != '0.0.0.0'
-    - interface_fact.ipv4.address | default != item.address or
-      interface_fact.ipv4.netmask | default != item.netmask
+    - >
+      'ipv4' not in interface_fact or
+      'address' not in interface_fact.ipv4 or
+      interface_fact.ipv4.address != item.address or
+      'netmask' not in interface_fact.ipv4 or
+      interface_fact.ipv4.netmask != item.netmask
   vars:
     interface_fact: >
       {{ hostvars[inventory_hostname]['ansible_' ~ item.device | replace('-', '_')] }}
