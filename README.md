@@ -123,7 +123,8 @@ address obtained via DHCP.
 ```
 
 5) Configure a routing table `myroutetable`, and an Ethernet interface `eth1`
-with an IP routing rule that defines when to use the routing table.
+with an IP routing rule that defines when to use the routing table. It also
+configures an IP route on the interface for the `myroutetable` routing table.
 
 ```yaml
 - hosts: myhost
@@ -144,6 +145,7 @@ with an IP routing rule that defines when to use the routing table.
           - network: 192.168.200.0
             netmask: 255.255.255.0
             gateway: 192.168.1.1
+            table: myroutetable
          rules:
           - from 192.168.200.0/24 table myroutetable
 ```
