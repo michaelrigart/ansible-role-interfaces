@@ -58,7 +58,7 @@ define static routes and a gateway.
          bootproto: dhcp
 ```
 
-2) Configure a bridge interface with multiple NIcs added to the bridge.
+2) Configure a bridge interface with multiple NICs added to the bridge.
 
 ```yaml
 - hosts: myhost
@@ -165,7 +165,7 @@ interfaces_ether_interfaces:
 
 Create a playbook which applies this role to all hosts as shown below, and run
 the playbook. All the servers should have their network interfaces configured
-and routed updated.
+and routes updated.
 
 ```yaml
 - hosts: all
