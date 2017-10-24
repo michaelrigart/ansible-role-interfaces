@@ -12,6 +12,7 @@ unable to recover without physical access to the machine._
 - Bonded interfaces
 - Network routes
 - IP routing tables
+- IP routing rules
 
 Role Variables
 --------------
@@ -121,7 +122,8 @@ address obtained via DHCP.
           bond_slaves: [eth1, eth2]
 ```
 
-5) Configure a routing table `myroutetable`, and an Ethernet interface `eth1`.
+5) Configure a routing table `myroutetable`, and an Ethernet interface `eth1`
+with an IP routing rule that defines when to use the routing table.
 
 ```yaml
 - hosts: myhost
@@ -142,6 +144,8 @@ address obtained via DHCP.
           - network: 192.168.200.0
             netmask: 255.255.255.0
             gateway: 192.168.1.1
+         rules:
+          - from 192.168.200.0/24 table myroutetable
 ```
 
 6) All the above examples show how to configure a single host, The below

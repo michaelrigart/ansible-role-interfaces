@@ -53,3 +53,9 @@ bond-slaves {{ item.bond_slaves|join(' ') }}
 up route add -net {{ i.network }} netmask {{ i.netmask }} gw {{ i.gateway }} dev {{ item.device }}
 {% endfor %}
 {% endif %}
+
+{% if item.rules is defined %}
+{% for rule in item.rules %}
+up ip rules add {{ rule }}
+{% endfor %}
+{% endif %}

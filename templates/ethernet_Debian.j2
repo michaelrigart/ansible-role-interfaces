@@ -32,6 +32,12 @@ up route add -net {{ i.network }} netmask {{ i.netmask }} gw {{ i.gateway }} dev
 {% endfor %}
 {% endif %}
 
+{% if item.rules is defined %}
+{% for rule in item.rules %}
+up ip rules add {{ rule }}
+{% endfor %}
+{% endif %}
+
 {% if item.device | match(vlan_interface_regex) %}
 vlan-raw-device {{ item.device | regex_replace(vlan_interface_suffix_regex, '') }}
 {% endif %}

@@ -29,6 +29,26 @@
   notify:
     - Bounce network devices
 
+- name: RedHat | Write configuration files for rhel rule configuration
+  template:
+    src: 'rule_{{ ansible_os_family }}.j2'
+    dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
+  with_items: '{{ interfaces_bond_interfaces }}'
+  when: item.rules is defined and ansible_os_family == 'RedHat'
+  register: bond_rule_add_result
+  notify:
+    - Bounce network devices
+
+- name: RedHat | Remove configuration files for rhel rule configuration
+  file:
+    path: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
+    state: absent
+  with_items: '{{ interfaces_bond_interfaces }}'
+  when: item.rules is not defined and ansible_os_family == 'RedHat'
+  register: bond_rule_del_result
+  notify:
+    - Bounce network devices
+
 - name: Create the network configuration file for slave in the bond devices
   template:
     src: 'bond_slave_{{ ansible_os_family }}.j2'
@@ -46,7 +66,9 @@
     all_bond_master_results: >
       {{ bond_result.results | default([]) +
          bond_route_add_result.results | default([]) +
-         bond_route_del_result.results | default([]) }}
+         bond_route_del_result.results | default([]) +
+         bond_rule_add_result.results | default([]) +
+         bond_rule_del_result.results | default([]) }}
 
 # bond_master_interfaces_changed and bond_slave_interfaces_changed are used in
 # the 'Bounce network devices' handler.
