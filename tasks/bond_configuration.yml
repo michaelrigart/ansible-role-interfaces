@@ -6,7 +6,10 @@
   with_items: '{{ interfaces_bond_interfaces }}'
   register: bond_result
   notify:
+    - Check whether /etc/modules-load.d exists
     - Make sure the bonding module is loaded
+    - Make sure the bonding module is loaded at boot via /etc/modules-load.d
+    - Make sure the bonding module is loaded at boot via /etc/modules
     - Bounce network devices
 
 - name: RedHat | Write configuration files for rhel route configuration

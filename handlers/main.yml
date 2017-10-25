@@ -2,10 +2,31 @@
 # NOTE: Handlers are executed in the order in which they are defined, not the
 # order in which they are notified.
 
+# Some systems do not support /etc/modules-load.d, in which case we fall back
+# to /etc/modules.
+- name: Check whether /etc/modules-load.d exists
+  stat:
+    path: /etc/modules-load.d
+  register: modules_load_stat
+
 - name: Make sure the bonding module is loaded
   modprobe:
     name: bonding
     state: present
+
+- name: Make sure the bonding module is loaded at boot via /etc/modules-load.d
+  template:
+    src: module.conf.j2
+    dest: /etc/modules-load.d/bonding.conf
+  when: modules_load_stat.stat.exists
+  vars:
+    module_name: bonding
+
+- name: Make sure the bonding module is loaded at boot via /etc/modules
+  lineinfile:
+    dest: /etc/modules
+    line: bonding
+  when: not modules_load_stat.stat.exists
 
 # We need to bounce the changed network interfaces carefully, as some
 # interfaces may depend on others. To further complicate matters, the
