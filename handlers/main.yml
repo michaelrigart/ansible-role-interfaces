@@ -28,6 +28,25 @@
     line: bonding
   when: not modules_load_stat.stat.exists
 
+- name: Make sure the 8021q module is loaded
+  modprobe:
+    name: 8021q
+    state: present
+
+- name: Make sure the 8021q module is loaded at boot via /etc/modules-load.d
+  template:
+    src: module.conf.j2
+    dest: /etc/modules-load.d/8021q.conf
+  when: modules_load_stat.stat.exists
+  vars:
+    module_name: 8021q
+
+- name: Make sure the 8021q module is loaded at boot via /etc/modules
+  lineinfile:
+    dest: /etc/modules
+    line: 8021q
+  when: not modules_load_stat.stat.exists
+
 # We need to bounce the changed network interfaces carefully, as some
 # interfaces may depend on others. To further complicate matters, the
 # dependencies are different between RedHat and Debian systems. Here are the
