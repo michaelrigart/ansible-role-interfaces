@@ -9,6 +9,29 @@
   with_items: '{{ interfaces_pkgs["debian"] }}'
   tags: package
 
+- name: Debian | install VLAN packages
+  apt:
+    pkg: vlan
+    state: '{{ interfaces_pkg_state }}'
+    update_cache: yes
+    cache_valid_time: 3600
+  when: >
+    all_interfaces |
+    selectattr('device', 'match', vlan_interface_regex) |
+    list |
+    length > 0
+  vars:
+    all_interfaces: >
+      {{ interfaces_ether_interfaces +
+         interfaces_bridge_interfaces +
+         interfaces_bond_interfaces }}
+  notify:
+    - Check whether /etc/modules-load.d exists
+    - Make sure the 8021q module is loaded
+    - Make sure the 8021q module is loaded at boot via /etc/modules-load.d
+    - Make sure the 8021q module is loaded at boot via /etc/modules
+  tags: package
+
 - name: Debian | Copy new interfaces file to source interfaces.d
   template:
     src: interfaces.j2
