@@ -1,6 +1,13 @@
 # {{ansible_managed}}
 {% for i in item.route %}
-ADDRESS{{ loop.index - 1  }}={{ i.network }}
-NETMASK{{ loop.index - 1 }}={{ i.netmask }}
-GATEWAY{{ loop.index - 1 }}={{ i.gateway }}
+{% set route = (i.network ~ '/' ~ i.netmask) | ipaddr('net') %}
+{% if 'gateway' in i %}
+{% set route = route ~ ' via ' ~ i.gateway %}
+{% else %}
+{% set route = route ~ ' dev ' ~ item.device %}
+{% endif %}
+{% if 'table' in i %}
+{% set route = route ~ ' table ' ~ i.table %}
+{% endif %}
+{{ route }}
 {% endfor %}

@@ -29,6 +29,26 @@
   notify:
     - Bounce network devices
 
+- name: RedHat | Write configuration files for rhel rule configuration
+  template:
+    src: 'rule_{{ ansible_os_family }}.j2'
+    dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
+  with_items: '{{ interfaces_bridge_interfaces }}'
+  when: item.rules is defined and ansible_os_family == 'RedHat'
+  register: bridge_rule_add_result
+  notify:
+    - Bounce network devices
+
+- name: RedHat | Remove configuration files for rhel rule configuration
+  file:
+    path: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
+    state: absent
+  with_items: '{{ interfaces_bridge_interfaces }}'
+  when: item.rules is not defined and ansible_os_family == 'RedHat'
+  register: bridge_rule_del_result
+  notify:
+    - Bounce network devices
+
 - name: Create the network configuration file for port on the bridge devices
   template:
     src: 'bridge_port_{{ ansible_os_family }}.j2'
@@ -49,7 +69,9 @@
     all_bridge_results: >
       {{ bridge_result.results | default([]) +
          bridge_route_add_result.results | default([]) +
-         bridge_route_del_result.results | default([]) }}
+         bridge_route_del_result.results | default([]) +
+         bridge_rule_add_result.results | default([]) +
+         bridge_rule_del_result.results | default([]) }}
 
 # bridge_interfaces_changed and bridge_port_interfaces_changed are used in the
 # 'Bounce network devices' handler.

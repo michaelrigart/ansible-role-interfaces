@@ -29,13 +29,35 @@
   notify:
     - Bounce network devices
 
+- name: RedHat | Write configuration files for rhel rule configuration
+  template:
+    src: 'rule_{{ ansible_os_family }}.j2'
+    dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
+  with_items: '{{ interfaces_ether_interfaces }}'
+  when: item.rules is defined and ansible_os_family == 'RedHat'
+  register: ether_rule_add_result
+  notify:
+    - Bounce network devices
+
+- name: RedHat | Remove configuration files for rhel rule configuration
+  file:
+    path: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
+    state: absent
+  with_items: '{{ interfaces_ether_interfaces }}'
+  when: item.rules is not defined and ansible_os_family == 'RedHat'
+  register: ether_rule_del_result
+  notify:
+    - Bounce network devices
+
 - name: Set a fact containing all ethernet results
   set_fact:
     # Build a list of all Ethernet results.
     all_ether_results: >
       {{ ether_result.results | default([]) +
          ether_route_add_result.results | default([]) +
-         ether_route_del_result.results | default([]) }}
+         ether_route_del_result.results | default([]) +
+         ether_rule_add_result.results | default([]) +
+         ether_rule_del_result.results | default([]) }}
 
 # ether_interfaces_changed is used in the 'Bounce network devices' handler.
 - name: Set a fact containing changed ethernet devices

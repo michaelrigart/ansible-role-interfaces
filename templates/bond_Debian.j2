@@ -50,6 +50,23 @@ bond-slaves {{ item.bond_slaves|join(' ') }}
 
 {% if item.route is defined %}
 {% for i in item.route %}
-up route add -net {{ i.network }} netmask {{ i.netmask }} gw {{ i.gateway }} dev {{ item.device }}
+{% set route = (i.network ~ '/' ~ i.netmask) | ipaddr('net') %}
+{% if 'gateway' in i %}
+{% set route = route ~ ' via ' ~ i.gateway %}
+{% else %}
+{% set route = route ~ ' dev ' ~ item.device %}
+{% endif %}
+{% if 'table' in i %}
+{% set route = route ~ ' table ' ~ i.table %}
+{% endif %}
+up ip route add {{ route }}
+down ip route del {{ route }}
+{% endfor %}
+{% endif %}
+
+{% if item.rules is defined %}
+{% for rule in item.rules %}
+up ip rule add {{ rule }}
+down ip rule del {{ rule }}
 {% endfor %}
 {% endif %}

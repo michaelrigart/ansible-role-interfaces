@@ -6,6 +6,9 @@
 - include: 'redhat.yml'
   when: ansible_os_family == 'RedHat'
 
+- include: 'route_table_configuration.yml'
+  tags: configuration
+
 - include: 'ethernet_configuration.yml'
   when: interfaces_ether_interfaces is defined
   tags: configuration
