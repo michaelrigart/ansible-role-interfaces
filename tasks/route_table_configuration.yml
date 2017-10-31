@@ -2,7 +2,7 @@
 
 - name: Ensure IP routing tables are defined
   blockinfile:
-    path: /etc/iproute2/rt_tables
+    dest: /etc/iproute2/rt_tables
     block: |
       {% for table in interfaces_route_tables %}
       {{ table.id }} {{ table.name }}
