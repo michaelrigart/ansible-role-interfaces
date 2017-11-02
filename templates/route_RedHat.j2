@@ -1,6 +1,8 @@
 # {{ansible_managed}}
 {% for i in item.route %}
-{% set route = (i.network ~ '/' ~ i.netmask) | ipaddr('net') %}
+{# Workaround for Ansible bug https://github.com/ansible/ansible/issues/17872. #}
+{% set prefix = ('0.0.0.0/' ~ i.netmask) | ipaddr('prefix') %}
+{% set route = i.network ~ '/' ~ prefix %}
 {% if 'gateway' in i %}
 {% set route = route ~ ' via ' ~ i.gateway %}
 {% else %}
