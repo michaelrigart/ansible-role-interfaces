@@ -137,92 +137,35 @@
     all_interfaces_changed: "{{ all_interfaces_changed_map[ansible_os_family] }}"
   notify:
     - Gather facts
-    - Verify network interfaces exist
-    - Verify network interfaces are active
-    - Verify network interface IP configuration
-    - Verify bond interface slaves
-    - Verify bridge interface ports
+    - Check active Ethernet interface state
+    - Check active bond interface state
+    - Check active bridge interface state
 
 # Update host facts so that we can verify the configuration has been applied
 # correctly.
 - name: Gather facts
   setup:
 
-- name: Verify network interfaces exist
+- name: Check active Ethernet interface state
   fail:
-    msg: >
-      Network interface {{ item }} does not exist.
-  with_flattened:
-    - "{{ ether_interfaces_changed }}"
-    - "{{ bridge_interfaces_changed }}"
-    - "{{ bond_master_interfaces_changed }}"
-    - "{{ bridge_port_interfaces_changed }}"
-    - "{{ bond_slave_interfaces_changed }}"
-  when: "'ansible_' ~ (item | replace('-', '_')) not in hostvars[inventory_hostname]"
-
-- name: Verify network interfaces are active
-  fail:
-    msg: >
-      Network interface {{ item }} is not active.
-  with_flattened:
-    - "{{ ether_interfaces_changed }}"
-    - "{{ bridge_interfaces_changed }}"
-    - "{{ bond_master_interfaces_changed }}"
-    - "{{ bridge_port_interfaces_changed }}"
-    - "{{ bond_slave_interfaces_changed }}"
-  when: not hostvars[inventory_hostname]['ansible_' ~ item | replace('-', '_')].active
-
-- name: Verify network interface IP configuration
-  fail:
-    msg: >
-      Unexpected IP configuration for interface {{ item.device }}.
-  with_flattened:
-    - "{{ interfaces_ether_interfaces }}"
-    - "{{ interfaces_bond_interfaces }}"
-    - "{{ interfaces_bridge_interfaces }}"
-  when:
-    - item.device in interfaces_changed
-    - item.bootproto | default == 'static'
-    - "'address' in item"
-    - item.address != '0.0.0.0'
-    - >
-      'ipv4' not in interface_fact or
-      'address' not in interface_fact.ipv4 or
-      interface_fact.ipv4.address != item.address or
-      'netmask' not in interface_fact.ipv4 or
-      interface_fact.ipv4.netmask != item.netmask
+    msg: "{{ ether_check.reason }}"
+  with_items: "{{ interfaces_ether_interfaces }}"
+  when: ether_check.diff
   vars:
-    interface_fact: >
-      {{ hostvars[inventory_hostname]['ansible_' ~ item.device | replace('-', '_')] }}
-    interfaces_changed: >
-      {{ ether_interfaces_changed +
-         bond_master_interfaces_changed +
-         bridge_interfaces_changed }}
+    ether_check: "{{ item | ether_check }}"
 
-- name: Verify bond interface slaves
+- name: Check active bond interface state
   fail:
-    msg: >
-      Interface {{ item.1 }} is not a slave of bond {{ item.0.device }}.
-  with_subelements:
-    - "{{ interfaces_bond_interfaces }}"
-    - "bond_slaves"
-  when:
-    - item.1 in bond_slave_interfaces_changed
-    - item.1 not in interface_fact.slaves | default([])
+    msg: "{{ bond_check.reason }}"
+  with_items: "{{ interfaces_bond_interfaces }}"
+  when: bond_check.diff
   vars:
-    interface_fact: >
-      {{ hostvars[inventory_hostname]['ansible_' ~ item.0.device | replace('-', '_')] }}
+    bond_check: "{{ item | bond_check }}"
 
-- name: Verify bridge interface ports
+- name: Check active bridge interface state
   fail:
-    msg: >
-      Interface {{ item.1 }} is not a port on bridge {{ item.0.device }}.
-  with_subelements:
-    - "{{ interfaces_bridge_interfaces }}"
-    - "ports"
-  when:
-    - item.0.device in bridge_interfaces_changed
-    - item.1 not in interface_fact.interfaces | default([])
+    msg: "{{ bridge_check.reason }}"
+  with_items: "{{ interfaces_bridge_interfaces }}"
+  when: bridge_check.diff
   vars:
-    interface_fact: >
-      {{ hostvars[inventory_hostname]['ansible_' ~ item.0.device | replace('-', '_')] }}
+    bridge_check: "{{ item | bridge_check }}"

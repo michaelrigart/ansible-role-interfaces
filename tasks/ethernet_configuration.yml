@@ -1,5 +1,18 @@
 ---
 
+- name: Check active Ethernet interface state
+  debug:
+    msg: >
+      Checking Ethernet interface configuration for {{ item.device }}:
+      {{ ether_check }}
+  with_items: "{{ interfaces_ether_interfaces }}"
+  changed_when: ether_check.diff
+  register: ether_check_result
+  notify:
+    - Bounce network devices
+  vars:
+    ether_check: "{{ item | ether_check }}"
+
 - name: Create the network configuration file for ethernet devices
   template:
     src: 'ethernet_{{ ansible_os_family }}.j2'
@@ -53,7 +66,8 @@
   set_fact:
     # Build a list of all Ethernet results.
     all_ether_results: >
-      {{ ether_result.results | default([]) +
+      {{ ether_check_result.results | default([]) +
+         ether_result.results | default([]) +
          ether_route_add_result.results | default([]) +
          ether_route_del_result.results | default([]) +
          ether_rule_add_result.results | default([]) +
