@@ -1,4 +1,18 @@
 ---
+
+- name: Check active bond interface state
+  debug:
+    msg: >
+      Checking bond interface configuration for {{ item.device }}:
+      {{ bond_check }}
+  with_items: "{{ interfaces_bond_interfaces }}"
+  changed_when: bond_check.diff
+  register: bond_check_result
+  notify:
+    - Bounce network devices
+  vars:
+    bond_check: "{{ item | bond_check }}"
+
 - name: Create the network configuration file for bond devices
   template:
     src: 'bond_{{ ansible_os_family }}.j2'
@@ -67,7 +81,8 @@
   set_fact:
     # Build a list of all bond master results.
     all_bond_master_results: >
-      {{ bond_result.results | default([]) +
+      {{ bond_check_result.results | default([]) +
+         bond_result.results | default([]) +
          bond_route_add_result.results | default([]) +
          bond_route_del_result.results | default([]) +
          bond_rule_add_result.results | default([]) +

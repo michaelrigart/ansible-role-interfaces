@@ -1,5 +1,18 @@
 ---
 
+- name: Check active bridge interface state
+  debug:
+    msg: >
+      Checking bridge interface configuration for {{ item.device }}:
+      {{ bridge_check }}
+  with_items: "{{ interfaces_bridge_interfaces }}"
+  changed_when: bridge_check.diff
+  register: bridge_check_result
+  notify:
+    - Bounce network devices
+  vars:
+    bridge_check: "{{ item | bridge_check }}"
+
 - name: Create the network configuration file for bridge devices
   template:
     src: 'bridge_{{ ansible_os_family }}.j2'
@@ -67,7 +80,8 @@
   set_fact:
     # Build a list of all bridge results.
     all_bridge_results: >
-      {{ bridge_result.results | default([]) +
+      {{ bridge_check_result.results | default([]) +
+         bridge_result.results | default([]) +
          bridge_route_add_result.results | default([]) +
          bridge_route_del_result.results | default([]) +
          bridge_rule_add_result.results | default([]) +
