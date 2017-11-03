@@ -18,7 +18,7 @@ BOOTPROTO=dhcp
 {% endif %}
 
 ONBOOT={{ item.onboot|default("yes") }}
-BONDING_OPTS="{% if item.bond_mode is defined %}mode={{ item.bond_mode }} {% endif %}miimon={{ item.bond_miimon|default(100) }} {% if item.bond_xmit_hash_policy is defined %}xmit_hash_policy={{ item.bond_xmit_hash_policy }} {% endif %}"
+BONDING_OPTS="{% if item.bond_mode is defined %}mode={{ item.bond_mode }} {% endif %}miimon={{ item.bond_miimon|default(100) }} {% if item.bond_updelay is defined %}updelay={{ item.bond_updelay }} {% endif %} {% if item.bond_downdelay is defined %}downdelay={{ item.bond_downdelay }} {% endif %} {% if item.bond_xmit_hash_policy is defined %}xmit_hash_policy={{ item.bond_xmit_hash_policy }} {% endif %} {% if item.bond_lacp_rate is defined %}lacp_rate={{ item.bond_lacp_rate }} {% endif %} "
 
 {% if ansible_distribution_major_version | int >= 7 %}
 NM_CONTROLLED=no

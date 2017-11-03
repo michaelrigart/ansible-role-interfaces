@@ -118,6 +118,7 @@ address obtained via DHCP.
           bond_miimon: 100
           bond_downdelay: 200
           bond_updelay: 200
+          bond_lacp_rate: 1
           bond_xmit_hash_policy: layer3+4
           bond_slaves: [eth1, eth2]
 ```

@@ -17,6 +17,9 @@ gateway {{ item.gateway }}
 bond-mode {{ item.bond_mode }}
 {% endif %}
 bond-miimon {{ item.bond_miimon|default(100) }}
+{% if item.bond_lacp_rate is defined %}
+bond-lacp-rate {{ item.bond_lacp_rate }}
+{% endif %}
 {% if item.bond_downdelay is defined %}
 bond-downdelay {{ item.bond_downdelay }}
 {% endif %}
