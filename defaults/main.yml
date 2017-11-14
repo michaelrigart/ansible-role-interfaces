@@ -5,10 +5,12 @@ interfaces_pkgs:
     - python-selinux
     - bridge-utils
     - ifenslave
+    - iproute2
     - resolvconf
   redhat:
     - libselinux-python
     - bridge-utils
+    - iproute
     - iputils
 interfaces_net_path:
   debian: /etc/network/interfaces.d
