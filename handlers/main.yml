@@ -112,7 +112,6 @@
 # correctly.
 - name: Gather facts
   setup:
-  register: myfacts
 
 - name: Verify network interfaces exist
   fail:
