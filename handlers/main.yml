@@ -98,7 +98,6 @@
   notify:
     - Pause playbook to give interfaces time to recover
     - Gather facts
-    - debug facts
     - Verify network interfaces exist
     - Verify network interfaces are active
     - Verify network interface IP configuration
@@ -107,16 +106,13 @@
 
 - name: Pause playbook to give interfaces time to recover
   pause:
-    seconds: {{ playbook_pause_time }}
+    seconds: "{{ playbook_pause_time }}"
 
 # Update host facts so that we can verify the configuration has been applied
 # correctly.
 - name: Gather facts
   setup:
   register: myfacts
-
-- name: debug facts
-  debug: var=myfacts
 
 - name: Verify network interfaces exist
   fail:
