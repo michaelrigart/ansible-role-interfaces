@@ -95,11 +95,11 @@
     nohup bash -c "
     returncode=0
     {% for interface in all_interfaces_changed | reverse %}
-    ifdown {{ interface }};
+    ifdown --allow auto {{ interface }};
     {% endfor %}
 
     {% for interface in all_interfaces_changed %}
-    if ! ifup {{ interface }}; then
+    if ! ifup --allow auto {{ interface }}; then
       echo \"Failed to bring up interface {{ interface }}\";
       returncode=1
     fi;
