@@ -1,4 +1,171 @@
 ---
+# NOTE: Handlers are executed in the order in which they are defined, not the
+# order in which they are notified.
 
-- name: restart networking
-  service: name=networking state=restarted
+# Some systems do not support /etc/modules-load.d, in which case we fall back
+# to /etc/modules.
+- name: Check whether /etc/modules-load.d exists
+  stat:
+    path: /etc/modules-load.d
+  register: modules_load_stat
+
+- name: Make sure the bonding module is loaded
+  modprobe:
+    name: bonding
+    state: present
+
+- name: Make sure the bonding module is loaded at boot via /etc/modules-load.d
+  template:
+    src: module.conf.j2
+    dest: /etc/modules-load.d/bonding.conf
+  when: modules_load_stat.stat.exists
+  vars:
+    module_name: bonding
+
+- name: Make sure the bonding module is loaded at boot via /etc/modules
+  lineinfile:
+    dest: /etc/modules
+    line: bonding
+  when: not modules_load_stat.stat.exists
+
+- name: Make sure the 8021q module is loaded
+  modprobe:
+    name: 8021q
+    state: present
+
+- name: Make sure the 8021q module is loaded at boot via /etc/modules-load.d
+  template:
+    src: module.conf.j2
+    dest: /etc/modules-load.d/8021q.conf
+  when: modules_load_stat.stat.exists
+  vars:
+    module_name: 8021q
+
+- name: Make sure the 8021q module is loaded at boot via /etc/modules
+  lineinfile:
+    dest: /etc/modules
+    line: 8021q
+  when: not modules_load_stat.stat.exists
+
+# We need to bounce the changed network interfaces carefully, as some
+# interfaces may depend on others. To further complicate matters, the
+# dependencies are different between RedHat and Debian systems. Here are the
+# possible dependencies between interface types (X -> Y means X depends on Y):
+#
+# Ethernet (VLAN) -> Ethernet
+# Ethernet (VLAN) -> bond master
+# Ethernet (VLAN) -> bridge
+# [RedHat] Bond master -> bridge
+# [RedHat] Bond slave -> bond master
+# [Debian] Bond master -> bond slave
+# Bond slave (VLAN) -> Ethernet
+# [RedHat] bridge port -> bridge
+# [Debian] bridge -> bridge port
+# [Debian] bridge -> bond master
+# Bridge port (VLAN) -> Ethernet
+# Bridge port (VLAN) -> bond master
+# Bridge port (VLAN) -> bridge
+#
+# Note that VLAN interfaces as bond slaves do not appear to work on Debian.
+#
+# This generates a number of valid orderings. For RedHat, we'll go with this
+# one:
+# - Ethernet (non VLAN)
+# - Bridge
+# - Bond master
+# - Bridge port
+# - Bond slave
+# - Ethernet (VLAN)
+#
+# And for Debian, this one:
+#
+# - Ethernet (non VLAN)
+# - Bond slave
+# - Bond master
+# - Bridge port (non VLAN)
+# - Bridge
+# - Bridge port (VLAN)
+# - Ethernet (VLAN)
+#
+# Also, use nohup to ensure the process survives termination of the SSH
+# connection.
+
+- name: Bounce network devices
+  command: >
+    nohup bash -c "
+    returncode=0
+    {% for interface in all_interfaces_changed | reverse %}
+    ifdown {{ interface }};
+    {% endfor %}
+
+    {% for interface in all_interfaces_changed %}
+    if ! ifup {{ interface }}; then
+      echo \"Failed to bring up interface {{ interface }}\";
+      returncode=1
+    fi;
+    {% endfor %}
+
+    exit $returncode"
+  vars:
+    ether_vlan_interfaces_changed: >
+      {{ ether_interfaces_changed | select('match', vlan_interface_regex) | list}}
+    ether_non_vlan_interfaces_changed: >
+      {{ ether_interfaces_changed | reject('match', vlan_interface_regex) | list }}
+    bridge_port_vlan_interfaces_changed: >
+      {{ bridge_port_interfaces_changed | select('match', vlan_interface_regex) | list}}
+    bridge_port_non_vlan_interfaces_changed: >
+      {{ bridge_port_interfaces_changed | reject('match', vlan_interface_regex) | list }}
+    all_interfaces_changed_map:
+      Debian: >
+        {{ ether_non_vlan_interfaces_changed +
+           bond_slave_interfaces_changed +
+           bond_master_interfaces_changed +
+           bridge_port_non_vlan_interfaces_changed +
+           bridge_interfaces_changed +
+           bridge_port_vlan_interfaces_changed +
+           ether_vlan_interfaces_changed }}
+      # On RedHat, bounce any changed bond master interfaces for a second time.
+      # The reason for this is unclear.
+      RedHat: >
+        {{ ether_non_vlan_interfaces_changed +
+           bridge_interfaces_changed +
+           bond_master_interfaces_changed +
+           bridge_port_interfaces_changed +
+           bond_slave_interfaces_changed +
+           ether_vlan_interfaces_changed +
+           bond_master_interfaces_changed }}
+    all_interfaces_changed: "{{ all_interfaces_changed_map[ansible_os_family] }}"
+  notify:
+    - Gather facts
+    - Check active Ethernet interface state
+    - Check active bond interface state
+    - Check active bridge interface state
+
+# Update host facts so that we can verify the configuration has been applied
+# correctly.
+- name: Gather facts
+  setup:
+
+- name: Check active Ethernet interface state
+  fail:
+    msg: "{{ ether_check.reason }}"
+  with_items: "{{ interfaces_ether_interfaces }}"
+  when: ether_check.diff
+  vars:
+    ether_check: "{{ item | ether_check }}"
+
+- name: Check active bond interface state
+  fail:
+    msg: "{{ bond_check.reason }}"
+  with_items: "{{ interfaces_bond_interfaces }}"
+  when: bond_check.diff
+  vars:
+    bond_check: "{{ item | bond_check }}"
+
+- name: Check active bridge interface state
+  fail:
+    msg: "{{ bridge_check.reason }}"
+  with_items: "{{ interfaces_bridge_interfaces }}"
+  when: bridge_check.diff
+  vars:
+    bridge_check: "{{ item | bridge_check }}"

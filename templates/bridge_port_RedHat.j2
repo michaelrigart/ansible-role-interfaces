@@ -11,6 +11,10 @@ ONBOOT={{ item.0.onboot }}
 NM_CONTROLLED=no
 {% endif %}
 
-{% if item.1 | match('.*\.\d{1,4}') %}
+{% if item.1 | match(vlan_interface_regex) %}
 VLAN=yes
+{% endif %}
+
+{% if item.0.mtu is defined %}
+MTU={{ item.0.mtu }}
 {% endif %}

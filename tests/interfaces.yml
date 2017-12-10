@@ -1,0 +1,76 @@
+---
+- hosts: localhost
+  become: True
+  vars:
+    veth1_name: veth1
+    veth1_peer: veth3
+    veth2_name: veth2
+    veth2_peer: veth4
+    bond_name: bond7
+    bridge_name: br42
+  pre_tasks:
+    - name: Ensure veth1 exists
+      command: ip l add name {{ veth1_name }} type veth peer name {{ veth1_peer }}
+      args:
+        creates: "/sys/class/net/{{ veth1_name }}"
+    - name: Ensure veth1 is up
+      command: ip l set {{ veth1_name }} up
+    - name: Ensure veth1 peer is up
+      command: ip l set {{ veth1_peer }} up
+
+    - name: Ensure veth2 exists
+      command: ip l add name {{ veth2_name }} type veth peer name {{ veth2_peer }}
+      args:
+        creates: "/sys/class/net/{{ veth2_name }}"
+    - name: Ensure veth2 is up
+      command: ip l set {{ veth2_name }} up
+    - name: Ensure veth2 peer is up
+      command: ip l set {{ veth2_peer }} up
+  roles:
+    - role: MichaelRigart.interfaces
+      interfaces_route_tables:
+        - id: 42
+          name: myroutetable
+      interfaces_ether_interfaces:
+        - device: "{{ veth1_name }}.1001"
+          bootproto: static
+          address: 10.1.0.1
+          netmask: 255.255.255.0
+          rules:
+            - from 10.1.0.0/24 table myroutetable
+            - to 10.1.0.0/24 table myroutetable
+          route:
+            - network: 10.6.0.0
+              netmask: 255.255.255.0
+              gateway: 10.1.0.2
+            - network: 10.3.0.0
+              netmask: 255.255.255.0
+              gateway: 10.1.0.3
+              table: myroutetable
+            - network: 10.1.0.0
+              netmask: 255.255.255.0
+              table: myroutetable
+        - device: "{{ bridge_name }}.1002"
+          bootproto: static
+          address: 10.2.0.1
+          netmask: 255.255.255.0
+        - device: "{{ bond_name }}.1003"
+          bootproto: static
+          address: 10.3.0.1
+          netmask: 255.255.255.0
+      interfaces_bond_interfaces:
+        - device: "{{ bond_name }}"
+          bootproto: static
+          address: 10.4.0.1
+          netmask: 255.255.255.0
+          bond_mode: 802.3ad
+          bond_slaves:
+            - "{{ veth1_name }}"
+            - "{{ veth2_name }}"
+      interfaces_bridge_interfaces:
+        - device: "{{ bridge_name }}"
+          bootproto: static
+          address: 10.5.0.1
+          netmask: 255.255.255.0
+          ports:
+            - "{{ bond_name }}.1005"
