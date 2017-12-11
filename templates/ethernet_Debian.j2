@@ -21,6 +21,11 @@ dns-nameservers {{ item.dnsnameservers }}
 dns-search {{ item.dnssearch }}
 {% endif %}
 
+{% if item.bootproto == 'manual' %}
+auto {{ item.device }}
+iface {{ item.device }} inet manual
+{% endif %}
+
 {% if item.bootproto == 'dhcp' %}
 auto {{ item.device }}
 iface {{ item.device }} inet dhcp
