@@ -89,17 +89,27 @@
 #
 # Also, use nohup to ensure the process survives termination of the SSH
 # connection.
+#
+# Note on "--allow" flag for Debian systems:
+#
+# On Debian system the "--allow" flag to "ifup/ifdown" behaves like a filter
+# to the interfaces configured in /etc/network/interfaces. On Debian you
+# cannot bounce an interface marked with "allow-hotplug" (e.g. a hot-pluggable
+# wifi interface) using "ifup/ifdown", it will fail. Adding the "--allow auto"
+# argument to "ifup/ifdown" will only be effective for interfaces marked with
+# "auto". Interfaces marked with "allow-hotplug" will simply be ignored then.
+#
 
 - name: Bounce network devices
   command: >
     nohup bash -c "
     returncode=0
     {% for interface in all_interfaces_changed | reverse %}
-    ifdown --allow auto {{ interface }};
+    ifdown {% if ansible_os_family == 'Debian' %}--allow auto {% endif %}{{ interface }};
     {% endfor %}
 
     {% for interface in all_interfaces_changed %}
-    if ! ifup --allow auto {{ interface }}; then
+    if ! ifup {% if ansible_os_family == 'Debian' %}--allow auto {% endif %}{{ interface }}; then
       echo \"Failed to bring up interface {{ interface }}\";
       returncode=1
     fi;
