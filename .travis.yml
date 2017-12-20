@@ -23,3 +23,6 @@ install:
 
 script:
   - venv/bin/ansible-playbook -b tests/interfaces.yml
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
