@@ -151,7 +151,29 @@ configures an IP route on the interface for the `myroutetable` routing table.
           - from 192.168.200.0/24 table myroutetable
 ```
 
-6) All the above examples show how to configure a single host, The below
+6) Configure a hot-pluggable Wifi interface `wlan0` with a static IP and a
+`wpa_supplicant` configuration. Also configure eth0 with a dhcp IP. 
+
+```yaml
+- hosts: myhost
+  roles:
+    - role: MichaelRigart.interfaces
+      interfaces_ether_interfaces:
+        - device: wlan0
+          allowclass: allow-hotplug
+          bootproto: static
+          address: 192.168.1.150
+          netmask: 255.255.255.0
+          network: 192.168.1.0
+          broadcast: 192.168.1.255
+          gateway: 192.168.1.1
+          dnsnameservers: 192.168.1.1
+          wpaconf: /etc/wpa_supplicant/wpa_supplicant.conf
+        - device: eth0
+          bootproto: dhcp
+```
+
+7) All the above examples show how to configure a single host, The below
 example shows how to define your network configurations for all your machines.
 
 Assume your host inventory is as follows:
