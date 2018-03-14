@@ -1,5 +1,7 @@
 # Copyright (c) 2017 StackHPC Ltd.
 
+import re
+
 import jinja2
 
 
@@ -21,7 +23,8 @@ def _device(interface):
 
 def _fact_name(device):
     """Return the name of the Ansible fact associated with an interface."""
-    return "ansible_%s" % device.replace("-", "_")
+    # Ansible fact names replace dashes and colons with an underscore.
+    return "ansible_%s" % re.sub(r"[\-\:]", "_", device)
 
 
 def _fact(context, device):
@@ -45,16 +48,20 @@ def _interface_check(context, interface, interface_type=None):
     if fact_name not in context:
         return _fail("Interface %s does not exist" % device)
 
-    # State
     fact = _fact(context, device)
-    if not fact["active"]:
-        return _fail("Interface %s is not active" % device)
 
-    # Type
-    if interface_type:
-        fact_type = fact["type"]
-        if interface_type != fact_type:
-            return _fail("Interface %s is of an unexpected type" % device)
+    # Interfaces with a colon (:) in their name are subinterfaces - effectively
+    # secondary IP addresses on another interface.
+    if ':' not in device:
+        # State
+        if not fact.get("active"):
+            return _fail("Interface %s is not active" % device)
+
+        # Type
+        if interface_type:
+            fact_type = fact["type"]
+            if interface_type != fact_type:
+                return _fail("Interface %s is of an unexpected type" % device)
 
     # Static IPv4 address
     if interface.get("bootproto") == "static" and interface.get("address"):
