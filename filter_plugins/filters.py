@@ -66,10 +66,18 @@ def _interface_check(context, interface, interface_type=None):
     # Static IPv4 address
     if interface.get("bootproto") == "static" and interface.get("address"):
         fact_address = fact.get("ipv4", {}).get("address")
+        secondaries = fact.get("ipv4_secondaries", None)
         if interface["address"] != "0.0.0.0":
             # IP address
             if not fact_address:
-                return _fail("Interface %s has no IPv4 address" % device)
+                if not secondaries:
+                    return _fail("Interface %s has no IPv4 address" % device)
+                else:
+                    for address_dict in secondaries:
+                        if interface['address'] == address_dict['address']:
+                            fact['ipv4'] = address_dict
+                            fact_address = address_dict['address']
+                            break
             if fact_address != interface["address"]:
                 return _fail("Interface %s has incorrect IPv4 address" % device)
 
