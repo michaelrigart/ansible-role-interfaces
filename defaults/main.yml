@@ -20,3 +20,4 @@ interfaces_route_tables: []
 interfaces_ether_interfaces: []
 interfaces_bridge_interfaces: []
 interfaces_bond_interfaces: []
+playbook_pause_time: 3

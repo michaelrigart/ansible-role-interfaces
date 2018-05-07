@@ -31,6 +31,26 @@ bond-xmit_hash_policy {{ item.bond_xmit_hash_policy }}
 {% endif %}
 {% if item.bond_slaves is defined and item.bond_mode == 'active-backup' %}
 bond-slaves none
+{% for slave in item.bond_slaves %}
+pre-up (sleep 2 && ifup {{ slave }}) &
+{% endfor %}
+{% endif %}
+{% if item.bond_slaves is defined and item.bond_mode == '802.3ad' %}
+bond-slaves {{ item.bond_slaves|join(' ') }}
+{% endif %}
+{% endif %}
+
+{% if item.bootproto == 'manual' %}
+iface {{ item.device }} inet manual
+{% if item.bond_mode is defined %}
+bond-mode {{ item.bond_mode }}
+{% endif %}
+bond-miimon {{ item.bond_miimon|default(100) }}
+{% if item.bond_slaves is defined and item.bond_mode == 'active-backup' %}
+bond-slaves none
+{% for slave in item.bond_slaves %}
+pre-up (sleep 2 && ifup {{ slave }}) &
+{% endfor %}
 {% endif %}
 {% if item.bond_slaves is defined and item.bond_mode == '802.3ad' %}
 bond-slaves {{ item.bond_slaves|join(' ') }}
@@ -45,6 +65,9 @@ bond-mode {{ item.bond_mode }}
 bond-miimon {{ item.bond_miimon|default(100) }}
 {% if item.bond_slaves is defined and item.bond_mode == 'active-backup' %}
 bond-slaves none
+{% for slave in item.bond_slaves %}
+pre-up (sleep 2 && ifup {{ slave }}) &
+{% endfor %}
 {% endif %}
 {% if item.bond_slaves is defined and item.bond_mode == '802.3ad' %}
 bond-slaves {{ item.bond_slaves|join(' ') }}
