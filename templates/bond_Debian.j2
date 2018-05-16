@@ -52,6 +52,18 @@ pre-up (sleep 2 && ifup {{ slave }}) &
 {% if item.bond_slaves is defined and item.bond_mode == '802.3ad' %}
 bond-slaves {{ item.bond_slaves|join(' ') }}
 {% endif %}
+{% if item.mtu is defined %}
+mtu {{ item.mtu }}
+{% endif %}
+{% if item.bond_downdelay is defined %}
+bond-downdelay {{ item.bond_downdelay }}
+{% endif %}
+{% if item.bond_updelay is defined %}
+bond-updelay {{ item.bond_updelay }}
+{% endif %}
+{% if item.bond_xmit_hash_policy is defined %}
+bond-xmit_hash_policy {{ item.bond_xmit_hash_policy }}
+{% endif %}
 {% endif %}
 
 {% if item.bootproto == 'dhcp' %}
