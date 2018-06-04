@@ -32,6 +32,16 @@
   notify:
     - Bounce network devices
 
+- name: RedHat | Write configuration files for rhel v6 route configuration
+  template:
+    src: 'route6_{{ ansible_os_family }}.j2'
+    dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/route6-{{ item.device }}'
+  with_items: '{{ interfaces_ether_interfaces }}'
+  when: item.ip6 is defined and item.ip6.route is defined and ansible_os_family == 'RedHat'
+  register: ether_route6_add_result
+  notify:
+    - Bounce network devices
+
 - name: RedHat | Remove configuration files for rhel route configuration
   file:
     path: '{{ interfaces_net_path[ansible_os_family|lower] }}/route-{{ item.device }}'
@@ -39,6 +49,16 @@
   with_items: '{{ interfaces_ether_interfaces }}'
   when: item.route is not defined and ansible_os_family == 'RedHat'
   register: ether_route_del_result
+  notify:
+    - Bounce network devices
+
+- name: RedHat | Remove configuration files for rhel v6 route configuration
+  file:
+    path: '{{ interfaces_net_path[ansible_os_family|lower] }}/route6-{{ item.device }}'
+    state: absent
+  with_items: '{{ interfaces_ether_interfaces }}'
+  when: item.ip6 is not defined and ansible_os_family == 'RedHat'
+  register: ether_route6_del_result
   notify:
     - Bounce network devices
 
@@ -70,6 +90,8 @@
          ether_result.results | default([]) +
          ether_route_add_result.results | default([]) +
          ether_route_del_result.results | default([]) +
+         ether_route6_add_result.results | default([]) +
+         ether_route6_del_result.results | default([]) +
          ether_rule_add_result.results | default([]) +
          ether_rule_del_result.results | default([]) }}
 
