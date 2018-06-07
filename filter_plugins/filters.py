@@ -90,9 +90,9 @@ def _interface_check(context, interface, interface_type=None):
             if interface.get("gateway"):
                 fact_gateway = context.get("ansible_default_ipv4", {}).get("gateway")
                 if not fact_gateway:
-                    return _fail("Default gateway is missing")
+                    return _fail("Default IPv4 gateway is missing")
                 if interface["gateway"] != fact_gateway:
-                    return _fail("Default gateway is incorrect")
+                    return _fail("Default IPv4 gateway is incorrect")
 
         elif fact_address:
             return _fail("Interface %s has an IPv4 address but none was "
@@ -110,6 +110,14 @@ def _interface_check(context, interface, interface_type=None):
                 break
         else:
             return _fail("Interface %s has incorrect IPv6 address" % device)
+        
+        # Gateway
+        if interface["ip6"].get("gateway"):
+            fact_gateway = context.get("ansible_default_ipv6", {}).get("gateway")
+            if not fact_gateway:
+                return _fail("Default IPv6 gateway is missing")
+            if interface["ip6"]["gateway"] != fact_gateway:
+                return _fail("Default IPv6 gateway is incorrect")
 
     # MTU
     if interface.get("mtu"):
