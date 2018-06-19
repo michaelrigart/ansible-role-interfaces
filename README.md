@@ -173,7 +173,30 @@ configures an IP route on the interface for the `myroutetable` routing table.
           bootproto: dhcp
 ```
 
-7) All the above examples show how to configure a single host, The below
+7) Configure a static IPv4 address, route along with an IPv6 address and route on an interface.
+
+```yaml
+- hosts: myhost
+  roles:
+    - role: MichaelRigart.interfaces
+      interfaces_ether_interfaces:
+        - device: ens160
+          bootproto: static
+          address: 10.99.99.2
+          netmask: 255.255.255.0
+          route:
+            - network: 10.99.98.0
+              netmask: 255.255.255.0
+              gateway: 10.99.99.1
+          ip6:
+            address: fd49:f9f5:ccb4:2acd::ac18:1002
+            prefix: 120
+            route:
+              - network: 64:FF9B::/96
+                gateway: fd49:f9f5:ccb4:2acd::ac18:1001
+```
+
+8) All the above examples show how to configure a single host, The below
 example shows how to define your network configurations for all your machines.
 
 Assume your host inventory is as follows:

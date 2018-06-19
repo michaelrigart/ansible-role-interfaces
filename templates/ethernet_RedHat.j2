@@ -31,3 +31,13 @@ VLAN=yes
 {% if item.mtu is defined %}
 MTU={{ item.mtu }}
 {% endif %}
+
+{% if item.bootproto == 'static' %}
+{% if item.ip6 is defined %}
+IPV6INIT=yes
+IPV6ADDR={{ item.ip6.address ~ '/' ~ item.ip6.prefix }}
+{% if item.ip6.gateway is defined %}
+IPV6_DEFAULTGW={{ item.ip6.gateway }}
+{% endif %}
+{% endif %}
+{% endif %}

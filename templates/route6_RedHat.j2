@@ -1,0 +1,18 @@
+# {{ansible_managed}}
+
+{% if item.ip6 is defined %}
+{% if item.ip6.route is defined %}
+{% for i in item.ip6.route %}
+{% set route = i.network %}
+{% if 'gateway' in i %}
+{% set route = route ~ ' via ' ~ i.gateway %}
+{% else %}
+{% set route = route ~ ' dev ' ~ item.device %}
+{% endif %}
+{% if 'table' in i %}
+{% set route = route ~ ' table ' ~ i.table %}
+{% endif %}
+{{ route }}
+{% endfor %}
+{% endif %}
+{% endif %}

@@ -61,3 +61,34 @@ down ip rule del {{ rule }}
 {% if item.device | match(vlan_interface_regex) %}
 vlan-raw-device {{ item.device | regex_replace(vlan_interface_suffix_regex, '') }}
 {% endif %}
+
+{% if item.bootproto == 'static' %}
+{% if item.ip6 is defined %}
+iface {{ item.device }} inet6 static
+address {{ item.ip6.address }}
+{% if item.ip6.prefix is defined %}
+netmask {{ item.ip6.prefix }}
+{% endif %}
+{% if item.ip6.gateway is defined %}
+gateway {{ item.ip6.gateway }}
+{% endif %}
+{% endif %}
+{% endif %}
+
+{% if item.ip6 is defined %}
+{% if item.ip6.route is defined %}
+{% for i in item.ip6.route %}
+{% set route = i.network %}
+{% if 'gateway' in i %}
+{% set route = route ~ ' via ' ~ i.gateway %}
+{% else %}
+{% set route = route ~ ' dev ' ~ item.device %}
+{% endif %}
+{% if 'table' in i %}
+{% set route = route ~ ' table ' ~ i.table %}
+{% endif %}
+up ip -6 route add {{ route }}
+down ip -6 route del {{ route }}
+{% endfor %}
+{% endif %}
+{% endif %}
