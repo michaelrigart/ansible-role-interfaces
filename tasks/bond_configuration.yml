@@ -71,8 +71,8 @@
     src: 'bond_slave_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/ifcfg-{{ item.1 }}'
   with_subelements:
-   - "{{ interfaces_bond_interfaces }}"
-   - bond_slaves
+    - "{{ interfaces_bond_interfaces }}"
+    - bond_slaves
   register: bond_slave_result
   notify:
     - Bounce network devices
