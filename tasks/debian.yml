@@ -2,11 +2,10 @@
 
 - name: Debian | install current/latest network packages versions
   apt:
-    pkg: '{{ item }}'
+    pkg: '{{ interfaces_pkgs["debian"]  }}'
     state: '{{ interfaces_pkg_state }}'
     update_cache: yes
     cache_valid_time: 3600
-  with_items: '{{ interfaces_pkgs["debian"] }}'
   tags: package
 
 - name: Debian | install VLAN packages
