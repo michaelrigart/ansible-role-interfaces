@@ -2,7 +2,6 @@
 
 - name: RedHat | install current/latest network packages versions
   yum:
-    name: '{{ item }}'
+    name: '{{  interfaces_pkgs["redhat"]  }'
     state: '{{ interfaces_pkg_state }}'
-  with_items: '{{ interfaces_pkgs["redhat"] }}'
   tags: package
