@@ -17,7 +17,7 @@ GATEWAY={{ item.gateway }}
 {% endif %}
 
 {% if item.bootproto == 'dhcp' %}
-TYPE=bridge
+TYPE=Bridge
 BOOTPROTO=dhcp
 {% if item.stp is defined %}
 STP={{ item.stp }}
