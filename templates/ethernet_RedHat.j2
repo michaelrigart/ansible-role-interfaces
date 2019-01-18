@@ -21,6 +21,10 @@ DNS{{ loop.index + 1 }}={{ dns_server }}
 BOOTPROTO=dhcp
 {% endif %}
 
+{% if item.defroute is defined %}
+DEFROUTE={{ item.defroute | ternary('yes', 'no') }}
+{% endif %}
+
 {% if item.onboot is defined %}
 ONBOOT={{ item.onboot }}
 {% endif %}
