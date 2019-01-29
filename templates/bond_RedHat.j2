@@ -18,7 +18,7 @@ BOOTPROTO=dhcp
 {% endif %}
 
 {% if item.defroute is defined %}
-DEFROUTE={{ item.defroute | ternary('yes', 'no') }}
+DEFROUTE={{ item.defroute | bool | ternary('yes', 'no') }}
 {% endif %}
 
 ONBOOT={{ item.onboot|default("yes") }}

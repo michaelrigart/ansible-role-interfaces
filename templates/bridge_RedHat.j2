@@ -25,7 +25,7 @@ STP={{ item.stp }}
 {% endif %}
 
 {% if item.defroute is defined %}
-DEFROUTE={{ item.defroute | ternary('yes', 'no') }}
+DEFROUTE={{ item.defroute | bool | ternary('yes', 'no') }}
 {% endif %}
 
 {% if item.onboot is defined %}
