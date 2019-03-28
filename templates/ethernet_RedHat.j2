@@ -15,6 +15,9 @@ GATEWAY={{ item.gateway }}
 DNS{{ loop.index + 1 }}={{ dns_server }}
 {% endfor %}
 {% endif %}
+{% if item.dnssearch is defined %}
+DOMAIN={{ item.dnssearch }}
+{% endif %}
 {% endif %}
 
 {% if item.bootproto == 'dhcp' %}
