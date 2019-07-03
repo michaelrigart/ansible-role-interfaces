@@ -12,7 +12,7 @@ GATEWAY={{ item.gateway }}
 {% endif %}
 {% if item.dnsnameservers is defined %}
 {% for dns_server in item.dnsnameservers.split(' ')[:2] %}
-DNS{{ loop.index + 1 }}={{ dns_server }}
+DNS{{ loop.index }}={{ dns_server }}
 {% endfor %}
 {% endif %}
 {% endif %}
