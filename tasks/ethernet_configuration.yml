@@ -1,5 +1,4 @@
 ---
-
 - name: Check active Ethernet interface state
   debug:
     msg: >
@@ -14,6 +13,7 @@
     ether_check: "{{ item | ether_check }}"
 
 - name: Create the network configuration file for ethernet devices
+  become: true
   template:
     src: 'ethernet_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/ifcfg-{{ item.device }}'
@@ -23,6 +23,7 @@
     - Bounce network devices
 
 - name: RedHat | Write configuration files for rhel route configuration
+  become: true
   template:
     src: 'route_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/route-{{ item.device }}'
@@ -33,6 +34,7 @@
     - Bounce network devices
 
 - name: RedHat | Write configuration files for rhel v6 route configuration
+  become: true
   template:
     src: 'route6_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/route6-{{ item.device }}'
@@ -43,6 +45,7 @@
     - Bounce network devices
 
 - name: RedHat | Remove configuration files for rhel route configuration
+  become: true
   file:
     path: '{{ interfaces_net_path[ansible_os_family|lower] }}/route-{{ item.device }}'
     state: absent
@@ -53,6 +56,7 @@
     - Bounce network devices
 
 - name: RedHat | Remove configuration files for rhel v6 route configuration
+  become: true
   file:
     path: '{{ interfaces_net_path[ansible_os_family|lower] }}/route6-{{ item.device }}'
     state: absent
@@ -63,6 +67,7 @@
     - Bounce network devices
 
 - name: RedHat | Write configuration files for rhel rule configuration
+  become: true
   template:
     src: 'rule_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
@@ -73,6 +78,7 @@
     - Bounce network devices
 
 - name: RedHat | Remove configuration files for rhel rule configuration
+  become: true
   file:
     path: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
     state: absent

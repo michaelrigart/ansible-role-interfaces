@@ -5,16 +5,19 @@
 # Some systems do not support /etc/modules-load.d, in which case we fall back
 # to /etc/modules.
 - name: Check whether /etc/modules-load.d exists
+  become: true
   stat:
     path: /etc/modules-load.d
   register: modules_load_stat
 
 - name: Make sure the bonding module is loaded
+  become: true
   modprobe:
     name: bonding
     state: present
 
 - name: Make sure the bonding module is loaded at boot via /etc/modules-load.d
+  become: true
   template:
     src: module.conf.j2
     dest: /etc/modules-load.d/bonding.conf
@@ -23,17 +26,20 @@
     module_name: bonding
 
 - name: Make sure the bonding module is loaded at boot via /etc/modules
+  become: true
   lineinfile:
     dest: /etc/modules
     line: bonding
   when: not modules_load_stat.stat.exists
 
 - name: Make sure the 8021q module is loaded
+  become: true
   modprobe:
     name: 8021q
     state: present
 
 - name: Make sure the 8021q module is loaded at boot via /etc/modules-load.d
+  become: true
   template:
     src: module.conf.j2
     dest: /etc/modules-load.d/8021q.conf
@@ -42,6 +48,7 @@
     module_name: 8021q
 
 - name: Make sure the 8021q module is loaded at boot via /etc/modules
+  become: true
   lineinfile:
     dest: /etc/modules
     line: 8021q
@@ -101,6 +108,7 @@
 #
 
 - name: Bounce network devices
+  become: true
   command: >
     nohup bash -c "
     returncode=0

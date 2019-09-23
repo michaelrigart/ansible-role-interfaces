@@ -1,5 +1,4 @@
 ---
-
 - name: Debian | install current/latest network packages versions
   apt:
     pkg: '{{ interfaces_pkgs["debian"]  }}'
@@ -7,8 +6,10 @@
     update_cache: yes
     cache_valid_time: 3600
   tags: package
+  become: true
 
 - name: Debian | install VLAN packages
+  become: true
   apt:
     pkg: vlan
     state: '{{ interfaces_pkg_state }}'
@@ -32,6 +33,7 @@
   tags: package
 
 - name: Debian | Copy new interfaces file to source interfaces.d
+  become: true
   template:
     src: interfaces.j2
     dest: /etc/network/interfaces
@@ -41,6 +43,7 @@
   tags: configuration
 
 - name: Debian | Create the directory for interface cfg files
+  become: true
   file:
     path: '{{ interfaces_net_path[ansible_os_family|lower] }}'
     state: directory

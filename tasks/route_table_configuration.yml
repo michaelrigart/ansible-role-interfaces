@@ -1,6 +1,6 @@
 ---
-
 - name: Ensure IP routing tables are defined
+  become: true
   blockinfile:
     dest: /etc/iproute2/rt_tables
     block: |
