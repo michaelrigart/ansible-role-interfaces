@@ -14,6 +14,7 @@
     bond_check: "{{ item | bond_check }}"
 
 - name: Create the network configuration file for bond devices
+  become: true
   template:
     src: 'bond_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/ifcfg-{{ item.device }}'
@@ -27,6 +28,7 @@
     - Bounce network devices
 
 - name: RedHat | Write configuration files for rhel route configuration
+  become: true
   template:
     src: 'route_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/route-{{ item.device }}'
@@ -37,6 +39,7 @@
     - Bounce network devices
 
 - name: RedHat | Remove configuration files for rhel route configuration
+  become: true
   file:
     path: '{{ interfaces_net_path[ansible_os_family|lower] }}/route-{{ item.device }}'
     state: absent
@@ -47,6 +50,7 @@
     - Bounce network devices
 
 - name: RedHat | Write configuration files for rhel rule configuration
+  become: true
   template:
     src: 'rule_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
@@ -57,6 +61,7 @@
     - Bounce network devices
 
 - name: RedHat | Remove configuration files for rhel rule configuration
+  become: true
   file:
     path: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
     state: absent
@@ -67,6 +72,7 @@
     - Bounce network devices
 
 - name: Create the network configuration file for slave in the bond devices
+  become: true
   template:
     src: 'bond_slave_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/ifcfg-{{ item.1 }}'

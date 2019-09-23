@@ -1,6 +1,5 @@
 ---
 - name: Check active bridge interface state
-  become: true
   debug:
     msg: >
       Checking bridge interface configuration for {{ item.device }}:

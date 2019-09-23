@@ -1,6 +1,5 @@
 ---
 - name: Check active Ethernet interface state
-  become: true
   debug:
     msg: >
       Checking Ethernet interface configuration for {{ item.device }}:
