@@ -1,6 +1,6 @@
 ---
-
 - name: Check active bridge interface state
+  become: true
   debug:
     msg: >
       Checking bridge interface configuration for {{ item.device }}:
@@ -14,6 +14,7 @@
     bridge_check: "{{ item | bridge_check }}"
 
 - name: Create the network configuration file for bridge devices
+  become: true
   template:
     src: 'bridge_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/ifcfg-{{ item.device }}'
@@ -23,6 +24,7 @@
     - Bounce network devices
 
 - name: RedHat | Write configuration files for rhel route configuration
+  become: true
   template:
     src: 'route_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/route-{{ item.device }}'
@@ -33,6 +35,7 @@
     - Bounce network devices
 
 - name: RedHat | Remove configuration files for rhel route configuration
+  become: true
   file:
     path: '{{ interfaces_net_path[ansible_os_family|lower] }}/route-{{ item.device }}'
     state: absent
@@ -43,6 +46,7 @@
     - Bounce network devices
 
 - name: RedHat | Write configuration files for rhel rule configuration
+  become: true
   template:
     src: 'rule_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
@@ -53,6 +57,7 @@
     - Bounce network devices
 
 - name: RedHat | Remove configuration files for rhel rule configuration
+  become: true
   file:
     path: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
     state: absent
@@ -63,6 +68,7 @@
     - Bounce network devices
 
 - name: Create the network configuration file for port on the bridge devices
+  become: true
   template:
     src: 'bridge_port_{{ ansible_os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/ifcfg-{{ item.1 }}'
