@@ -14,7 +14,7 @@ netmask {{ item.netmask }}
 gateway {{ item.gateway }}
 {% endif %}
 {% if item.ports is defined %}
-bridge_ports {{ item.ports|join(' ') }}
+bridge_ports {{ item.ports|join(' ') }}{% if item.ports | default([], true) | length == 0 %}none{% endif %}
 {% endif %}
 {% if item.stp is defined %}
 bridge_stp {{ item.stp }}
