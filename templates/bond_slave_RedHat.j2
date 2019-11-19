@@ -5,7 +5,7 @@ ONBOOT=yes
 SLAVE=yes
 USERCTL=no
 
-{% if item.1 | match(vlan_interface_regex) %}
+{% if item.1 is match(vlan_interface_regex) %}
 VLAN=yes
 {% endif %}
 
