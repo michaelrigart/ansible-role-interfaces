@@ -8,10 +8,15 @@ interfaces_pkgs:
     - iproute2
     - resolvconf
   redhat:
-    - libselinux-python
-    - bridge-utils
-    - iproute
-    - iputils
+    '7':
+      - libselinux-python
+      - bridge-utils
+      - iproute
+      - iputils
+    '8':
+      - iproute
+      - iputils
+      - network-scripts
 interfaces_net_path:
   debian: /etc/network/interfaces.d
   redhat: /etc/sysconfig/network-scripts
