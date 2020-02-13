@@ -1,6 +1,7 @@
 ---
 galaxy_info:
   author: Michaël Rigart
+  role_name: interfaces
   description: An ansible role for configuring different network interfaces.
   company: Netronix.be
   license: GPLv3
