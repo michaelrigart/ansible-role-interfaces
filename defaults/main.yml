@@ -25,3 +25,5 @@ interfaces_route_tables: []
 interfaces_ether_interfaces: []
 interfaces_bridge_interfaces: []
 interfaces_bond_interfaces: []
+interfaces_workaround_centos_remove:
+  - ens3

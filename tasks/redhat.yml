@@ -6,6 +6,24 @@
     state: '{{ interfaces_pkg_state }}'
   tags: package
 
+# CentOS 8 cloud images ship with an ifcfg file for ens3. This seems to be a
+# relic from the image build process, and causes the network service to fail.
+# Remove this file.
+
+- name: RedHat | remove invalid interface configuration
+  become: true
+  file:
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ item }}"
+    state: absent
+  when:
+    - item not in ansible_interfaces
+    - item not in interfaces_ether_interfaces | map(attribute='device') | list
+    - item not in interfaces_bridge_interfaces | map(attribute='device') | list
+    - item not in interfaces_bridge_interfaces | map(attribute='ports') | flatten | list
+    - item not in interfaces_bond_interfaces | map(attribute='device') | list
+    - item not in interfaces_bond_interfaces | map(attribute='bond_slaves') | flatten | list
+  with_items: "{{ interfaces_workaround_centos_remove }}"
+
 - name: RedHat | ensure network service is started and enabled
   become: true
   service:
