@@ -257,6 +257,26 @@ may need to have a control interface that you do *not* modify using this
 method so that Ansible has a stable connection to configure the target
 systems.
 
+9) CentOS 8 cloud image workaround
+
+CentOS 8 cloud images ship with an ifcfg file for ens3. This seems to be a
+relic from the image build process, and causes the network service to fail.
+This role will by default remove this file, if there is no ens3 interface on
+the system, and no ens3 interface is specified in the role variables.
+
+This workaround is configured via `interfaces_workaround_centos_remove`. To
+set a different interface file to remove:
+
+```yaml
+interfaces_workaround_centos_remove:
+  - eth1
+```
+
+Or to avoid performing this workaround:
+
+```yaml
+interfaces_workaround_centos_remove: []
+```
 
 Example Playbook
 ----------------
