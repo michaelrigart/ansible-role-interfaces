@@ -94,7 +94,7 @@ def _interface_check(context, interface, interface_type=None):
                 if interface["gateway"] != fact_gateway:
                     return _fail("Default IPv4 gateway is incorrect")
 
-        elif fact_address:
+        elif fact_address and fact_address not in interface.get('allowed_addresses', []):
             return _fail("Interface %s has an IPv4 address but none was "
                          "requested" % device)
     

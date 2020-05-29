@@ -278,6 +278,26 @@ Or to avoid performing this workaround:
 interfaces_workaround_centos_remove: []
 ```
 
+10) Allowed addresses
+
+Sometimes it may be useful to not immediately assign an IP address to an
+interface, but to allow another process to assign one. An example use case is a
+virtual IP address dynamically added or by a process such as keepalived.
+This may be configured via an `allowed_addresses` field in an Ethernet, bond or
+bridge interface configuration.
+
+```yaml
+- hosts: myhost
+  roles:
+    - role: MichaelRigart.interfaces
+      interfaces_ether_interfaces:
+        - device: eth0
+          bootproto: static
+          address: 0.0.0.0
+          allowed_addresses:
+            - 10.0.0.2
+```
+
 Example Playbook
 ----------------
 
