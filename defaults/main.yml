@@ -27,3 +27,4 @@ interfaces_bridge_interfaces: []
 interfaces_bond_interfaces: []
 interfaces_workaround_centos_remove:
   - ens3
+  - eth0
