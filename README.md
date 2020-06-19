@@ -259,10 +259,12 @@ systems.
 
 9) CentOS 8 cloud image workaround
 
-CentOS 8 cloud images ship with an ifcfg file for ens3. This seems to be a
-relic from the image build process, and causes the network service to fail.
-This role will by default remove this file, if there is no ens3 interface on
-the system, and no ens3 interface is specified in the role variables.
+CentOS 8 cloud images ship with ifcfg files for ens3 and eth0. ifcfg-ens3 seems
+to be a relic from the image build process, and causes the network service to
+fail. ifcfg-eth0 is useful for most virtual machines, but if a cloud image is
+deployed on bare metal and eth0 is absent, the network service will fail. This
+role will by default remove these files, if there is no such interface on the
+system, and no such interface is specified in the role variables.
 
 This workaround is configured via `interfaces_workaround_centos_remove`. To
 set a different interface file to remove:

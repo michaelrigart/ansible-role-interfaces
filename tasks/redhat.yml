@@ -6,9 +6,12 @@
     state: '{{ interfaces_pkg_state }}'
   tags: package
 
-# CentOS 8 cloud images ship with an ifcfg file for ens3. This seems to be a
-# relic from the image build process, and causes the network service to fail.
-# Remove this file.
+# CentOS 8 cloud images ship with ifcfg files for ens3 and eth0. ifcfg-ens3
+# seems to be a relic from the image build process, and causes the network
+# service to fail. ifcfg-eth0 is useful for most virtual machines, but if a
+# cloud image is deployed on bare metal and eth0 is absent, the network service
+# will fail. Remove these files if the interface does not exist or is not being
+# configured.
 
 - name: RedHat | remove invalid interface configuration
   become: true
