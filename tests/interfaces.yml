@@ -50,6 +50,11 @@
             - network: 10.1.0.0
               netmask: 255.255.255.0
               table: myroutetable
+            - network: 10.7.0.0
+              netmask: 255.255.255.0
+              gateway: 10.1.0.2
+              options:
+                - onlink
         - device: "{{ bridge_name }}.1002"
           bootproto: static
           address: 10.2.0.1

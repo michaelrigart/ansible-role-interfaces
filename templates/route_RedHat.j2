@@ -11,5 +11,8 @@
 {% if 'table' in i %}
 {% set route = route ~ ' table ' ~ i.table %}
 {% endif %}
+{% if 'options' in i %}
+{% set route = route ~ ' ' ~ i.options | join(' ') %}
+{% endif %}
 {{ route }}
 {% endfor %}

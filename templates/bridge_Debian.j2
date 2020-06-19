@@ -44,6 +44,9 @@ bridge_stp {{ item.stp }}
 {% if 'table' in i %}
 {% set route = route ~ ' table ' ~ i.table %}
 {% endif %}
+{% if 'options' in i %}
+{% set route = route ~ ' ' ~ i.options | join(' ') %}
+{% endif %}
 up ip route add {{ route }}
 down ip route del {{ route }}
 {% endfor %}
