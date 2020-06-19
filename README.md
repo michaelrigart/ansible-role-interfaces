@@ -298,6 +298,27 @@ bridge interface configuration.
             - 10.0.0.2
 ```
 
+11) Custom options for static routes
+
+Adding custom options to static routes is possible via the `options` attribute,
+which should be a list.
+
+```yaml
+- hosts: myhost
+  roles:
+    - role: MichaelRigart.interfaces
+      interfaces_ether_interfaces:
+        - device: eth0
+          bootproto: static
+          address: 0.0.0.0
+          route:
+           - network: 192.168.200.0
+             netmask: 255.255.255.0
+             gateway: 192.168.1.1
+             options:
+               - onlink
+               - metric 400
+
 Example Playbook
 ----------------
 
