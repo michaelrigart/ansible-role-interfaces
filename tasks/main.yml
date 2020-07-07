@@ -10,13 +10,13 @@
   tags: configuration
 
 - include: 'ethernet_configuration.yml'
-  when: interfaces_ether_interfaces is defined
+  when: interfaces_ether_interfaces | length > 0
   tags: configuration
 
 - include: 'bond_configuration.yml'
-  when: interfaces_bond_interfaces is defined
+  when: interfaces_bond_interfaces | length > 0
   tags: configuration
 
 - include: 'bridge_configuration.yml'
-  when: interfaces_bridge_interfaces is defined
+  when: interfaces_bridge_interfaces | length > 0
   tags: configuration
