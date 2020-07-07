@@ -9,6 +9,10 @@
 - include: 'route_table_configuration.yml'
   tags: configuration
 
+- include: 'ipoib_configuration.yml'
+  when: interfaces_ipoib_interfaces is defined
+  tags: configuration
+
 - include: 'ethernet_configuration.yml'
   when: interfaces_ether_interfaces is defined
   tags: configuration

@@ -1,0 +1,42 @@
+---
+- name: Check active IPoIB interface state
+  debug:
+    msg: >
+      Checking IPoIB interface configuration for {{ item.device }}:
+      {{ ipoib_check }}
+  with_items: "{{ interfaces_ipoib_interfaces }}"
+  changed_when: ipoib_check.diff
+  register: ipoib_check_result
+  notify:
+    - Bounce network devices
+  vars:
+    ipoib_check: "{{ item | ipoib_check }}"
+
+- name: Create the network configuration file for IPoIB devices
+  become: true
+  template:
+    src: 'ethernet_{{ ansible_os_family }}.j2'
+    dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/ifcfg-{{ item.device }}'
+  with_items: '{{ interfaces_ipoib_interfaces }}'
+  register: ipoib_result
+  notify:
+    - Bounce network devices
+
+- name: Set a fact containing all IPoIB results
+  set_fact:
+    # Build a list of all IPoIB results.
+    all_ipoib_results: >
+      {{ ipoib_check_result.results | default([]) +
+         ipoib_result.results | default([]) }}
+
+# ipoib_interfaces_changed is used in the 'Bounce network devices' handler.
+- name: Set a fact containing changed IPoIB devices
+  set_fact:
+    # Select those tasks which changed, and map to a list of the corresponding
+    # ipoib devices.
+    ipoib_interfaces_changed: >
+      {{ all_ipoib_results |
+         select('changed') |
+         map(attribute='item.device') |
+         unique |
+         list }}
