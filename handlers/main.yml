@@ -136,6 +136,7 @@
     all_interfaces_changed_map:
       Debian: >
         {{ ether_non_vlan_interfaces_changed +
+           ipoib_interfaces_changed +
            bond_slave_interfaces_changed +
            bond_master_interfaces_changed +
            bridge_port_non_vlan_interfaces_changed +
@@ -146,6 +147,7 @@
       # The reason for this is unclear.
       RedHat: >
         {{ ether_non_vlan_interfaces_changed +
+           ipoib_interfaces_changed +
            bridge_interfaces_changed +
            bond_master_interfaces_changed +
            bridge_port_interfaces_changed +
