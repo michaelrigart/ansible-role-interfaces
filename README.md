@@ -320,6 +320,31 @@ which should be a list.
              options:
                - onlink
                - metric 400
+```
+
+12) Configure an IPoIB (infiniband) interface
+
+Configuring an IPoIB interface is possible using `type: ipoib` when defining the interface.
+
+**WARNING: You can configure the ip address and routes for an IPoIB interface but other functionalities like vlans are not supported in infiniband networks**
+
+```yaml
+- hosts: myhost
+  roles:
+    - role: MichaelRigart.interfaces
+      interfaces_ether_interfaces:
+        - device: eth0
+          bootproto: static
+          address: 192.168.1.150
+          netmask: 255.255.255.0
+          gateway: 192.168.1.1
+        - device: ib0
+          bootproto: static
+          address: 10.10.1.10
+          netmask: 255.255.255.0
+          type: ipoib
+```
+
 
 Example Playbook
 ----------------

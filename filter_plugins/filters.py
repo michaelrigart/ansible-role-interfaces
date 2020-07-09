@@ -136,7 +136,10 @@ def ether_check(context, interface):
     :param interface: An item in interfaces_ether_interfaces.
     :returns: A dict containing 'diff' and 'reason' items.
     """
-    result = _interface_check(context, interface, "ether")
+    if interface.get('type') == 'ipoib':
+        result = _interface_check(context, interface, "infiniband")
+    else:
+        result = _interface_check(context, interface, "ether")
     return result
 
 
