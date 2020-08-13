@@ -5,6 +5,10 @@ ONBOOT=yes
 SLAVE=yes
 USERCTL=no
 
+{% if item.ethtool_opts is defined %}
+ETHTOOL_OPTS={{ item.ethtool_opts }}
+{% endif %}
+
 {% if item.1 is match(vlan_interface_regex) %}
 VLAN=yes
 {% endif %}
