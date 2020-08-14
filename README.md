@@ -345,6 +345,28 @@ Configuring an IPoIB interface is possible using `type: ipoib` when defining the
           type: ipoib
 ```
 
+13) Configure ethtool options (RedHat-family only)
+
+Setting ethtool options on an interface is possible using the `ethtool_opts`
+attribute, which should be a string. For example, this can be used to set RX/TX
+ring parameters. This is only supported on distributions of the RedHat family.
+
+```yaml
+- hosts: myhost
+  roles:
+    - role: MichaelRigart.interfaces
+      interfaces_ether_interfaces:
+        - device: eth0
+          bootproto: static
+          address: 192.168.1.150
+          netmask: 255.255.255.0
+          gateway: 192.168.1.1
+          ethtool_opts: "-G ${DEVICE} rx 8192 tx 8192"
+```
+
+To apply ethtool options to bond slaves or bridge ports, set the attribute on
+the bond or bridge itself. Setting different options per underlying interface
+is not supported at this time.
 
 Example Playbook
 ----------------

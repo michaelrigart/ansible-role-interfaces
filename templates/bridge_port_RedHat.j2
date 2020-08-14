@@ -3,6 +3,10 @@ TYPE=Ethernet
 BOOTPROTO=none
 BRIDGE={{ item.0.device }}
 
+{% if item.0.ethtool_opts is defined %}
+ETHTOOL_OPTS="{{ item.0.ethtool_opts }}"
+{% endif %}
+
 {% if item.0.onboot is defined %}
 ONBOOT={{ item.0.onboot }}
 {% endif %}
