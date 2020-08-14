@@ -28,6 +28,10 @@ BOOTPROTO=dhcp
 DEFROUTE={{ item.defroute | bool | ternary('yes', 'no') }}
 {% endif %}
 
+{% if item.ethtool_opts is defined %}
+ETHTOOL_OPTS="{{ item.ethtool_opts }}"
+{% endif %}
+
 {% if item.onboot is defined %}
 ONBOOT={{ item.onboot }}
 {% endif %}
