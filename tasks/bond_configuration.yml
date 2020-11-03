@@ -93,6 +93,16 @@
          bond_route_del_result.results | default([]) +
          bond_rule_add_result.results | default([]) +
          bond_rule_del_result.results | default([]) }}
+    # Find bond interfaces which have all members changed. We do this by
+    # excluding any bonds which have an unchanged member.
+    bond_master_interfaces_with_all_slaves_changed: >
+     {{ interfaces_bond_interfaces |
+        map(attribute='device') |
+        difference(bond_slave_result.results |
+                   reject('changed') |
+                   map(attribute='item.0.device') |
+                   list) |
+        list }}
 
 # bond_master_interfaces_changed and bond_slave_interfaces_changed are used in
 # the 'Bounce network devices' handler.
@@ -100,10 +110,16 @@
   set_fact:
     # Select those tasks which changed, and map to a list of the corresponding
     # bond master devices.
+    # On CentOS/RHEL systems, if all members in a bond go down, the bond
+    # interface will also go down. If the members are brought back up again,
+    # the bond interface does not automatically come back up. Add bond
+    # interfaces which have all members changed to the list.
     bond_master_interfaces_changed: >
-      {{ all_bond_master_results |
-         select('changed') |
-         map(attribute='item.device') |
+      {{ (all_bond_master_results |
+          select('changed') |
+          map(attribute='item.device') |
+          list +
+          bond_master_interfaces_with_all_slaves_changed) |
          unique |
          list }}
     # Select those tasks which changed, and map to a list of the corresponding
