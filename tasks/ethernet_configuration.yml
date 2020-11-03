@@ -88,8 +88,9 @@
   notify:
     - Bounce network devices
 
-- name: Set a fact containing all ethernet results
-  set_fact:
+# ether_interfaces_changed is used in the 'Bounce network devices' handler.
+- name: Set a fact containing changed ethernet devices
+  vars:
     # Build a list of all Ethernet results.
     all_ether_results: >
       {{ ether_check_result.results | default([]) +
@@ -100,10 +101,6 @@
          ether_route6_del_result.results | default([]) +
          ether_rule_add_result.results | default([]) +
          ether_rule_del_result.results | default([]) }}
-
-# ether_interfaces_changed is used in the 'Bounce network devices' handler.
-- name: Set a fact containing changed ethernet devices
-  set_fact:
     # Select those tasks which changed, and map to a list of the corresponding
     # Ethernet devices.
     ether_interfaces_changed: >
@@ -112,3 +109,15 @@
          map(attribute='item.device') |
          unique |
          list }}
+    vlan_on_changed_interface_regex: "{{ '(' ~ ((ether_interfaces_changed + bond_master_interfaces_changed + bridge_interfaces_changed) | join('|')) ~ ')' ~ vlan_interface_suffix_regex }}"
+    # Find VLAN interfaces which have a changed parent device. At least on
+    # CentOS/RHEL 7 systems, any static routes on the VLAN interface are lost
+    # if the parent goes down.
+    vlans_on_changed_interfaces: >
+      {{ all_ether_results |
+         map(attribute='item.device') |
+         select('match', vlan_on_changed_interface_regex) |
+         unique |
+         list }}
+  set_fact:
+    ether_interfaces_changed: "{{ (ether_interfaces_changed + vlans_on_changed_interfaces) | unique | list}}"
