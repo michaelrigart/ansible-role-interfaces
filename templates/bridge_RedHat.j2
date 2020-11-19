@@ -39,3 +39,7 @@ NM_CONTROLLED=no
 {% if item.mtu is defined %}
 MTU={{ item.mtu }}
 {% endif %}
+
+{% if item.zone is defined %}
+ZONE="{{ item.zone }}"
+{% endif %}

@@ -48,6 +48,10 @@ VLAN=yes
 MTU={{ item.mtu }}
 {% endif %}
 
+{% if item.zone is defined %}
+ZONE="{{ item.zone }}"
+{% endif %}
+
 {% if item.bootproto == 'static' %}
 {% if item.ip6 is defined %}
 IPV6INIT=yes

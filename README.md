@@ -368,6 +368,24 @@ To apply ethtool options to bond slaves or bridge ports, set the attribute on
 the bond or bridge itself. Setting different options per underlying interface
 is not supported at this time.
 
+14) Configure firewalld zones (RedHat-family only)
+
+  Adding interface to firewalld zone is possible using the `zone` attribute. 
+  This is only supported on distributions of the RedHat family.
+
+  ```yaml
+ - hosts: myhost
+   roles:
+     - role: MichaelRigart.interfaces
+       interfaces_ether_interfaces:
+         - device: eth0
+           bootproto: static
+           address: 192.168.1.150
+           netmask: 255.255.255.0
+           gateway: 192.168.1.1
+           zone: trusted
+ ```
+
 Example Playbook
 ----------------
 

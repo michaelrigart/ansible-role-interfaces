@@ -32,6 +32,10 @@ NM_CONTROLLED=no
 MTU={{ item.mtu }}
 {% endif %}
 
+{% if item.zone is defined %}
+ZONE="{{ item.zone }}"
+{% endif %}
+
 {% for bridge in interfaces_bridge_interfaces %}
 {% if item.device in bridge.ports %}
 BRIDGE={{ bridge.device }}
