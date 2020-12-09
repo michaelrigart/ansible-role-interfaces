@@ -1,3 +1,5 @@
+# {{ ansible_managed }}
+
 auto {{ item.1 }}
 iface {{ item.1 }} inet manual
 bond-master {{ item.0.device }}

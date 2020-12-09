@@ -1,3 +1,5 @@
+# {{ ansible_managed }}
+
 {% if item.bootproto == 'static' %}
 {{ item.allowclass | default('auto') }} {{ item.device }}
 iface {{ item.device }} inet static
