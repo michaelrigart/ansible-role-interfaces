@@ -52,6 +52,7 @@ define static routes and a gateway.
          dnsnameservers: 192.0.2.1 192.0.2.2
          dnssearch: example.com
          mtu: 9000
+         pre_up: sleep 5
          route:
           - network: 192.168.200.0
             netmask: 255.255.255.0

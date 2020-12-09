@@ -1,5 +1,8 @@
 # {{ ansible_managed }}
 
+{% if item.pre_up is defined %}
+pre-up {{ item.pre_up }}
+{% endif %}
 auto {{ item.device }}
 {% if item.bootproto == 'static' %}
 iface {{ item.device }} inet static
