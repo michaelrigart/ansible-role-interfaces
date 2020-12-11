@@ -91,6 +91,16 @@
          bridge_route_del_result.results | default([]) +
          bridge_rule_add_result.results | default([]) +
          bridge_rule_del_result.results | default([]) }}
+    # Find bridge interfaces which have all ports changed. We do this by
+    # excluding any bridges which have an unchanged port.
+    bridge_interfaces_with_all_ports_changed: >
+     {{ interfaces_bridge_interfaces |
+        map(attribute='device') |
+        difference(bridge_port_result.results |
+                   reject('changed') |
+                   map(attribute='item.0.device') |
+                   list) |
+        list }}
 
 # bridge_interfaces_changed and bridge_port_interfaces_changed are used in the
 # 'Bounce network devices' handler.
@@ -98,10 +108,16 @@
   set_fact:
     # Select those tasks which changed, and map to a list of the corresponding
     # bridge devices.
+    # On CentOS/RHEL 8 systems, if all ports of a bridge go down, the bridge
+    # interface will also go down. If the ports are brought back up again,
+    # the bridge interface does not automatically come back up. Add bridge
+    # interfaces which have all ports changed to the list.
     bridge_interfaces_changed: >
-      {{ all_bridge_results |
-         select('changed') |
-         map(attribute='item.device') |
+      {{ (all_bridge_results |
+          select('changed') |
+          map(attribute='item.device') |
+          list +
+          bridge_interfaces_with_all_ports_changed) |
          unique |
          list }}
     # Select those tasks which changed, and map to a list of the corresponding
