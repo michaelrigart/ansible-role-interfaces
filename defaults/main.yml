@@ -2,7 +2,7 @@
 
 interfaces_pkgs:
   debian:
-    - python-selinux
+    - python{% if ansible_python.version.major >= 3 %}3{% endif %}-selinux
     - bridge-utils
     - ifenslave
     - iproute2
