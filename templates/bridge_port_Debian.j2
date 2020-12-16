@@ -1,3 +1,5 @@
+# {{ ansible_managed }}
+
 auto {{ item.1 }}
 iface {{ item.1 }}  inet manual
 {% if item.1 is match(vlan_interface_regex) %}
