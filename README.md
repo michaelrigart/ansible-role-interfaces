@@ -387,6 +387,12 @@ is not supported at this time.
            zone: trusted
  ```
 
+15) Pause to wait for interfaces to become active
+
+On some OS distributions (including Ubuntu), it may be necessary to wait after
+bouncing network interfaces before they are active. This can be done by setting
+``interfaces_pause_time`` to a number of seconds to delay.
+
 Example Playbook
 ----------------
 

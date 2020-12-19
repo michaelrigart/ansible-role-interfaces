@@ -29,3 +29,4 @@ interfaces_workaround_centos_remove:
   - ens3
   - ens3-1
   - eth0
+interfaces_pause_time: 0
