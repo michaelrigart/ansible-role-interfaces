@@ -154,10 +154,15 @@
            bond_master_interfaces_changed }}
     all_interfaces_changed: "{{ all_interfaces_changed_map[ansible_os_family] }}"
   notify:
+    - Pause to wait for interfaces to become active
     - Gather facts
     - Check active Ethernet interface state
     - Check active bond interface state
     - Check active bridge interface state
+
+- name: Pause to wait for interfaces to become active
+  pause:
+    seconds: "{{ interfaces_pause_time }}"
 
 # Update host facts so that we can verify the configuration has been applied
 # correctly.
