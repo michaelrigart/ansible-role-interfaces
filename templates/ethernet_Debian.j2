@@ -1,11 +1,11 @@
 # {{ ansible_managed }}
 
-{% if item.pre_up is defined %}
-pre-up {{ item.pre_up }}
-{% endif %}
 {% if item.bootproto == 'static' %}
 {{ item.allowclass | default('auto') }} {{ item.device }}
 iface {{ item.device }} inet static
+{% if item.pre_up is defined %}
+pre-up {{ item.pre_up }}
+{% endif %}
 {% if item.wpaconf is defined %}
 wpa-conf {{ item.wpaconf }}
 {% endif %}

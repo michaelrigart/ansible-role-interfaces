@@ -1,11 +1,11 @@
 # {{ ansible_managed }}
 
-{% if item.pre_up is defined %}
-pre-up {{ item.pre_up }}
-{% endif %}
 auto {{ item.device }}
 {% if item.bootproto == 'static' %}
 iface {{ item.device }} inet static
+{% if item.pre_up is defined %}
+pre-up {{ item.pre_up }}
+{% endif %}
 {% if item.mtu is defined %}
 mtu {{ item.mtu }}
 {% endif %}
@@ -34,10 +34,10 @@ bond-updelay {{ item.bond_updelay }}
 {% if item.bond_xmit_hash_policy is defined %}
 bond-xmit_hash_policy {{ item.bond_xmit_hash_policy }}
 {% endif %}
-{% if item.bond_slaves is defined and item.bond_mode == 'active-backup' %}
+{% if item.bond_slaves is defined and item.bond_mode | default == 'active-backup' %}
 bond-slaves none
 {% endif %}
-{% if item.bond_slaves is defined and item.bond_mode == '802.3ad' %}
+{% if item.bond_slaves is defined and item.bond_mode | default == '802.3ad' %}
 bond-slaves {{ item.bond_slaves|join(' ') }}
 {% endif %}
 {% endif %}
@@ -48,10 +48,10 @@ iface {{ item.device }} inet dhcp
 bond-mode {{ item.bond_mode }}
 {% endif %}
 bond-miimon {{ item.bond_miimon|default(100) }}
-{% if item.bond_slaves is defined and item.bond_mode == 'active-backup' %}
+{% if item.bond_slaves is defined and item.bond_mode | default == 'active-backup' %}
 bond-slaves none
 {% endif %}
-{% if item.bond_slaves is defined and item.bond_mode == '802.3ad' %}
+{% if item.bond_slaves is defined and item.bond_mode | default == '802.3ad' %}
 bond-slaves {{ item.bond_slaves|join(' ') }}
 {% endif %}
 {% endif %}

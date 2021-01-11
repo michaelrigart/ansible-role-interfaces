@@ -5,7 +5,7 @@ interfaces_pkgs:
     - python{% if ansible_python.version.major >= 3 %}3{% endif %}-selinux
     - bridge-utils
     - ifenslave
-    - ifupdown2
+    - ifupdown
     - iproute2
     - resolvconf
   redhat:
