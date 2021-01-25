@@ -1,13 +1,13 @@
 # {{ ansible_managed }}
 
-{% if item.bootproto == 'static' %}
 {{ item.allowclass | default('auto') }} {{ item.device }}
+{% if item.bootproto == 'dhcp' %}
+iface {{ item.device }} inet dhcp
+{% endif %}
+{% if item.bootproto == 'static' %}
 iface {{ item.device }} inet static
 {% if item.pre_up is defined %}
 pre-up {{ item.pre_up }}
-{% endif %}
-{% if item.wpaconf is defined %}
-wpa-conf {{ item.wpaconf }}
 {% endif %}
 {% if item.mtu is defined %}
 mtu {{ item.mtu }}
@@ -28,15 +28,14 @@ dns-nameservers {{ item.dnsnameservers }}
 {% if item.dnssearch is defined %}
 dns-search {{ item.dnssearch }}
 {% endif %}
-{% if item.bootproto == 'dhcp' %}
-{{ item.allowclass | default('auto') }} {{ item.device }}
-iface {{ item.device }} inet dhcp
+{% if item.hwaddr is defined %}
+hwaddress ether {{ item.hwaddr }}
+{% endif %}
 {% if item.wpaconf is defined %}
 wpa-conf {{ item.wpaconf }}
 {% endif %}
-{% endif %}
-{% if item.route is defined %}
 
+{% if item.route is defined %}
 {% for i in item.route %}
 {# Workaround for Ansible bug https://github.com/ansible/ansible/issues/17872. #}
 {% set prefix = ('0.0.0.0/' ~ i.netmask) | ipaddr('prefix') %}
