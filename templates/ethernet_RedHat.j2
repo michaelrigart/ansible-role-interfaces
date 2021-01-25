@@ -1,11 +1,12 @@
 # {{ ansible_managed }}
 
 DEVICE={{ item.device }}
-{% if item.bootproto == 'static' %}
-BOOTPROTO=none
+TYPE=Ethernet
 {% if item.hwaddr is defined %}
 HWADDR={{ item.hwaddr }}
 {% endif %}
+{% if item.bootproto == 'static' %}
+BOOTPROTO=none
 {% if item.address is defined %}
 IPADDR={{ item.address }}
 {% endif %}

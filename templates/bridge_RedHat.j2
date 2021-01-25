@@ -1,8 +1,11 @@
 # {{ ansible_managed }}
 
 DEVICE={{ item.device }}
-{% if item.bootproto == 'static' %}
 TYPE=Bridge
+{% if item.hwaddr is defined %}
+HWADDR={{ item.hwaddr }}
+{% endif %}
+{% if item.bootproto == 'static' %}
 BOOTPROTO=none
 {% if item.stp is defined %}
 STP={{ item.stp }}
@@ -19,7 +22,6 @@ GATEWAY={{ item.gateway }}
 {% endif %}
 
 {% if item.bootproto == 'dhcp' %}
-TYPE=Bridge
 BOOTPROTO=dhcp
 {% if item.stp is defined %}
 STP={{ item.stp }}
