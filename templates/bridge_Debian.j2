@@ -1,14 +1,11 @@
 # {{ ansible_managed }}
 
 auto {{ item.device }}
+{% if item.bootproto == 'dhcp' %}
+iface {{ item.device }} inet dhcp
+{% endif %}
 {% if item.bootproto == 'static' %}
 iface {{ item.device }} inet static
-{% if item.pre_up is defined %}
-pre-up {{ item.pre_up }}
-{% endif %}
-{% if item.mtu is defined %}
-mtu {{ item.mtu }}
-{% endif %}
 {% if item.address is defined %}
 address {{ item.address }}
 {% endif %}
@@ -18,22 +15,21 @@ netmask {{ item.netmask }}
 {% if item.gateway is defined %}
 gateway {{ item.gateway }}
 {% endif %}
+{% endif %}
+{% if item.mtu is defined %}
+mtu {{ item.mtu }}
+{% endif %}
+{% if item.hwaddr is defined %}
+hwaddress {{ item.hwaddr }}
+{% endif %}
+{% if item.pre_up is defined %}
+pre-up {{ item.pre_up }}
+{% endif %}
 {% if item.ports is defined %}
 bridge_ports {{ item.ports|join(' ') }}{% if item.ports | default([], true) | length == 0 %}none{% endif %}
 {% endif %}
 {% if item.stp is defined %}
 bridge_stp {{ item.stp }}
-{% endif %}
-{% endif %}
-
-{% if item.bootproto == 'dhcp' %}
-iface {{ item.device }} inet dhcp
-{% if item.ports is defined %}
-bridge_ports {{ item.ports|join(' ') }}
-{% endif %}
-{% if item.stp is defined %}
-bridge_stp {{ item.stp }}
-{% endif %}
 {% endif %}
 
 {% if item.route is defined %}

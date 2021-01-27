@@ -1,14 +1,11 @@
 # {{ ansible_managed }}
 
 auto {{ item.device }}
+{% if item.bootproto == 'dhcp' %}
+iface {{ item.device }} inet dhcp
+{% endif %}
 {% if item.bootproto == 'static' %}
 iface {{ item.device }} inet static
-{% if item.pre_up is defined %}
-pre-up {{ item.pre_up }}
-{% endif %}
-{% if item.mtu is defined %}
-mtu {{ item.mtu }}
-{% endif %}
 {% if item.address is defined %}
 address {{ item.address }}
 {% endif %}
@@ -17,6 +14,16 @@ netmask {{ item.netmask }}
 {% endif %}
 {% if item.gateway is defined %}
 gateway {{ item.gateway }}
+{% endif %}
+{% endif %}
+{% if item.mtu is defined %}
+mtu {{ item.mtu }}
+{% endif %}
+{% if item.hwaddr is defined %}
+hwaddress {{ item.hwaddr }}
+{% endif %}
+{% if item.pre_up is defined %}
+pre-up {{ item.pre_up }}
 {% endif %}
 {% if item.bond_mode is defined %}
 bond-mode {{ item.bond_mode }}
@@ -39,21 +46,6 @@ bond-slaves none
 {% endif %}
 {% if item.bond_slaves is defined and item.bond_mode | default == '802.3ad' %}
 bond-slaves {{ item.bond_slaves|join(' ') }}
-{% endif %}
-{% endif %}
-
-{% if item.bootproto == 'dhcp' %}
-iface {{ item.device }} inet dhcp
-{% if item.bond_mode is defined %}
-bond-mode {{ item.bond_mode }}
-{% endif %}
-bond-miimon {{ item.bond_miimon|default(100) }}
-{% if item.bond_slaves is defined and item.bond_mode | default == 'active-backup' %}
-bond-slaves none
-{% endif %}
-{% if item.bond_slaves is defined and item.bond_mode | default == '802.3ad' %}
-bond-slaves {{ item.bond_slaves|join(' ') }}
-{% endif %}
 {% endif %}
 
 {% if item.route is defined %}

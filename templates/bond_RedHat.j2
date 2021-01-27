@@ -1,6 +1,10 @@
 # {{ ansible_managed }}
 
 DEVICE={{ item.device }}
+TYPE=Bond
+{% if item.hwaddr is defined %}
+HWADDR={{ item.hwaddr }}
+{% endif %}
 USERCTL=no
 {% if item.bootproto == 'static' %}
 BOOTPROTO=none
@@ -14,30 +18,23 @@ NETMASK={{ item.netmask }}
 GATEWAY={{ item.gateway }}
 {% endif %}
 {% endif %}
-
 {% if item.bootproto == 'dhcp' %}
 BOOTPROTO=dhcp
 {% endif %}
-
 {% if item.defroute is defined %}
 DEFROUTE={{ item.defroute | bool | ternary('yes', 'no') }}
 {% endif %}
-
-ONBOOT={{ item.onboot|default("yes") }}
+ONBOOT={{ item.onboot | bool | ternary('yes', 'no') }}
 BONDING_OPTS="{% if item.bond_mode is defined %}mode={{ item.bond_mode }} {% endif %}miimon={{ item.bond_miimon|default(100) }} {% if item.bond_updelay is defined %}updelay={{ item.bond_updelay }} {% endif %} {% if item.bond_downdelay is defined %}downdelay={{ item.bond_downdelay }} {% endif %} {% if item.bond_xmit_hash_policy is defined %}xmit_hash_policy={{ item.bond_xmit_hash_policy }} {% endif %} {% if item.bond_lacp_rate is defined %}lacp_rate={{ item.bond_lacp_rate }} {% endif %} "
-
 {% if ansible_distribution_major_version | int >= 7 %}
 NM_CONTROLLED=no
 {% endif %}
-
 {% if item.mtu is defined %}
 MTU={{ item.mtu }}
 {% endif %}
-
 {% if item.zone is defined %}
 ZONE="{{ item.zone }}"
 {% endif %}
-
 {% for bridge in interfaces_bridge_interfaces %}
 {% if item.device in bridge.ports %}
 BRIDGE={{ bridge.device }}

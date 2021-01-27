@@ -393,6 +393,46 @@ On some OS distributions (including Ubuntu), it may be necessary to wait after
 bouncing network interfaces before they are active. This can be done by setting
 ``interfaces_pause_time`` to a number of seconds to delay.
 
+16) Configure HW(MAC) address for interface
+
+  Configuring interface HW adrress is possible using the `hwaddr` attribute.
+  This alone may not be sufficient to change MAC from default one, however
+  specifying hw address is necessary for some systems.
+
+```yaml
+ - hosts: myhost
+   roles:
+     - role: MichaelRigart.interfaces
+       interfaces_ether_interfaces:
+         - device: eth0
+           bootproto: static
+           address: 192.168.1.150
+           netmask: 255.255.255.0
+           gateway: 192.168.1.1
+           hwaddr: 00:11:22:33:44:55
+```
+
+17) Configure HW(MAC) address for bonded/bridged interface
+
+  Configuring interface HW adrress is possible using the `hwaddr` attribute.
+
+```yaml
+- hosts: myhost
+  roles:
+    - role: MichaelRigart.interfaces
+      interfaces_bond_interfaces:
+        - device: bond0
+          bootproto: dhcp
+          bond_mode: 802.3ad
+          hwaddr: 00:11:22:33:44:55
+      interfaces_bridge_interfaces:
+       -  device: br1
+          type: bridge
+          bootproto: dhcp
+          hwaddr: 00:11:22:33:44:66
+          ports: [eth1, eth2]
+```
+
 Example Playbook
 ----------------
 
