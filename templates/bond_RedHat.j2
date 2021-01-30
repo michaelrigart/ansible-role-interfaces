@@ -3,7 +3,7 @@
 DEVICE={{ item.device }}
 TYPE=Bond
 {% if item.hwaddr is defined %}
-HWADDR={{ item.hwaddr }}
+MACADDR={{ item.hwaddr }}
 {% endif %}
 USERCTL=no
 {% if item.bootproto == 'static' %}
