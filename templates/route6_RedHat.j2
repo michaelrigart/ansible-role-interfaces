@@ -5,7 +5,7 @@
 {% for i in item.ip6.route %}
 {% set route = i.network %}
 {% if 'gateway' in i %}
-{% set route = route ~ ' via ' ~ i.gateway %}
+{% set route = route ~ ' via ' ~ i.gateway ~ ' dev ' ~ item.device %}
 {% else %}
 {% set route = route ~ ' dev ' ~ item.device %}
 {% endif %}
