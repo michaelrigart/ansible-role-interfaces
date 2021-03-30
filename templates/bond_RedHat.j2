@@ -3,7 +3,7 @@
 DEVICE={{ item.device }}
 TYPE=Bond
 {% if item.hwaddr is defined %}
-HWADDR={{ item.hwaddr }}
+MACADDR={{ item.hwaddr }}
 {% endif %}
 USERCTL=no
 {% if item.bootproto == 'static' %}
@@ -17,6 +17,14 @@ NETMASK={{ item.netmask }}
 {% if item.gateway is defined %}
 GATEWAY={{ item.gateway }}
 {% endif %}
+{% endif %}
+{% if item.dnsnameservers is defined %}
+{% for dns_server in item.dnsnameservers.split(' ')[:2] %}
+DNS{{ loop.index }}={{ dns_server }}
+{% endfor %}
+{% endif %}
+{% if item.dnssearch is defined %}
+DOMAIN={{ item.dnssearch }}
 {% endif %}
 {% if item.bootproto == 'dhcp' %}
 BOOTPROTO=dhcp
