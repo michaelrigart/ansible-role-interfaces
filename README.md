@@ -111,8 +111,9 @@ added for ethernet interfaces.
             gateway: 192.168.1.1
 ```
 
-4) Configure a bonded interface with "802.3ad" as the bonding mode and IP
-address obtained via DHCP.
+4) Configure a bonded interface with "802.3ad" as the bonding mode, specify the
+802.3ad aggregation selection logic to use the aggregator with largest aggregate
+bandwidth, and IP address obtained via DHCP.
 
 ```yaml
 - hosts: myhost
@@ -122,6 +123,7 @@ address obtained via DHCP.
         - device: bond0
           bootproto: dhcp
           bond_mode: 802.3ad
+          bond_ad_select: bandwidth
           bond_miimon: 100
           bond_downdelay: 200
           bond_updelay: 200
