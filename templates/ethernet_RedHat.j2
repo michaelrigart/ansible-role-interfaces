@@ -7,11 +7,22 @@ HWADDR={{ item.hwaddr }}
 {% endif %}
 {% if item.bootproto == 'static' %}
 BOOTPROTO=none
+{% if item.addresses is defined and item.addresses is iterable %}
+{% for item0 in item.addresses %}
+{% if item0.address is defined %}
+IPADDR{{ loop.index - 1}}={{ item0.address }}
+{% endif %}
+{% if item0.netmask is defined %}
+NETMASK{{ loop.index -1 }}={{ item0.netmask }}
+{% endif %}
+{% endfor %}
+{% else %}
 {% if item.address is defined %}
 IPADDR={{ item.address }}
 {% endif %}
 {% if item.netmask is defined %}
 NETMASK={{ item.netmask }}
+{% endif %}
 {% endif %}
 {% if item.gateway is defined %}
 GATEWAY={{ item.gateway }}
