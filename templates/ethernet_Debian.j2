@@ -6,11 +6,23 @@ iface {{ item.device }} inet dhcp
 {% endif %}
 {% if item.bootproto == 'static' %}
 iface {{ item.device }} inet static
+{% if item.addresses is defined and item.addresses is iterable %}
+{% if item.addresses[0].address is defined %}
+address {{ item.addresses[0].address }}
+{% else %}
 {% if item.address is defined %}
 address {{ item.address }}
 {% endif %}
+{% endif %}
+{% endif %}
+{% if item.addresses is defined and item.addresses is iterable %}
+{% if item.addresses[0].netmask is defined %}
+netmask {{ item.addresses[0].netmask }}
+{% else %}
 {% if item.netmask is defined %}
 netmask {{ item.netmask }}
+{% endif %}
+{% endif %}
 {% endif %}
 {% if item.gateway is defined %}
 gateway {{ item.gateway }}
@@ -33,6 +45,26 @@ dns-search {{ item.dnssearch }}
 {% endif %}
 {% if item.wpaconf is defined %}
 wpa-conf {{ item.wpaconf }}
+{% endif %}
+
+{% if item.addresses is defined and item.addresses | length > 1 %}
+{% for item0 in item.addresses %}
+{% if loop.index > 1 %}
+{% if item.bootproto == 'dhcp' %}
+iface {{ item.device }} inet dhcp
+{% endif %}
+{% if item.bootproto == 'static' %}
+iface {{ item.device }} inet static
+{% endif %}
+{% if item0.address is defined %}
+address {{ item0.address }}
+{% endif %}
+{% if item0.netmask is defined %}
+netmask {{ item0.netmask }}
+{% endif %}
+
+{% endif %}
+{% endfor %}
 {% endif %}
 
 {% if item.route is defined %}
@@ -64,7 +96,8 @@ down ip rule del {{ rule }}
 {% endif %}
 {% if item.device is match(vlan_interface_regex) %}
 
-vlan-raw-device {{ item.device | regex_replace(vlan_interface_suffix_regex, '') }}
+vlan-raw-device {{ item.device | regex_replace(vlan_interface_suffix_regex, '')
+}}
 {% endif %}
 {% if item.bootproto == 'static' %}
 
