@@ -96,8 +96,7 @@ down ip rule del {{ rule }}
 {% endif %}
 {% if item.device is match(vlan_interface_regex) %}
 
-vlan-raw-device {{ item.device | regex_replace(vlan_interface_suffix_regex, '')
-}}
+vlan-raw-device {{ item.device | regex_replace(vlan_interface_suffix_regex, '') }}
 {% endif %}
 {% if item.bootproto == 'static' %}
 
