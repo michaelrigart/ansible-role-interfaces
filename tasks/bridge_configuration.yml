@@ -81,7 +81,7 @@
   notify:
     - Bounce network devices
 
-- name: Set a fact  containing all bridge results
+- name: Set a fact containing all bridge results
   set_fact:
     # Build a list of all bridge results.
     all_bridge_results: >
