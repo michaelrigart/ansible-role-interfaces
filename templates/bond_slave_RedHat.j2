@@ -15,6 +15,6 @@ ETHTOOL_OPTS="{{ item.0.ethtool_opts }}"
 VLAN=yes
 {% endif %}
 
-{% if ansible_distribution_major_version | int >= 7 %}
+{% if ansible_facts.distribution_major_version | int >= 7 %}
 NM_CONTROLLED=no
 {% endif %}

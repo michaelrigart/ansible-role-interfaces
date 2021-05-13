@@ -29,7 +29,7 @@ DEFROUTE={{ item.defroute | bool | ternary('yes', 'no') }}
 {% if item.onboot is defined %}
 ONBOOT={{ item.onboot | bool | ternary('yes', 'no') }}
 {% endif %}
-{% if ansible_distribution_major_version | int >= 7 %}
+{% if ansible_facts.distribution_major_version | int >= 7 %}
 NM_CONTROLLED=no
 {% endif %}
 {% if item.mtu is defined %}

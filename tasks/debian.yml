@@ -45,6 +45,6 @@
 - name: Debian | Create the directory for interface cfg files
   become: true
   file:
-    path: '{{ interfaces_net_path[ansible_os_family|lower] }}'
+    path: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}'
     state: directory
   tags: configuration

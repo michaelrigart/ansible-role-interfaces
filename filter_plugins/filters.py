@@ -24,13 +24,13 @@ def _device(interface):
 def _fact_name(device):
     """Return the name of the Ansible fact associated with an interface."""
     # Ansible fact names replace dashes and colons with an underscore.
-    return "ansible_%s" % re.sub(r"[\-\:]", "_", device)
+    return re.sub(r"[\-\:]", "_", device)
 
 
 def _fact(context, device):
     """Return the fact associated with an interface."""
     fact_name = _fact_name(device)
-    return context[fact_name]
+    return context["ansible_facts"][fact_name]
 
 
 def _interface_check(context, interface, interface_type=None):
@@ -45,7 +45,7 @@ def _interface_check(context, interface, interface_type=None):
 
     # Existence
     fact_name = _fact_name(device)
-    if fact_name not in context:
+    if fact_name not in context["ansible_facts"]:
         return _fail("Interface %s does not exist" % device)
 
     fact = _fact(context, device)
@@ -88,7 +88,7 @@ def _interface_check(context, interface, interface_type=None):
 
             # Gateway
             if interface.get("gateway"):
-                fact_gateway = context.get("ansible_default_ipv4", {}).get("gateway")
+                fact_gateway = context["ansible_facts"].get("default_ipv4", {}).get("gateway")
                 if not fact_gateway:
                     return _fail("Default IPv4 gateway is missing")
                 if interface["gateway"] != fact_gateway:
@@ -113,7 +113,7 @@ def _interface_check(context, interface, interface_type=None):
         
         # Gateway
         if interface["ip6"].get("gateway"):
-            fact_gateway = context.get("ansible_default_ipv6", {}).get("gateway")
+            fact_gateway = context["ansible_facts"].get("default_ipv6", {}).get("gateway")
             if not fact_gateway:
                 return _fail("Default IPv6 gateway is missing")
             if interface["ip6"]["gateway"] != fact_gateway:
