@@ -16,8 +16,8 @@
 - name: Create the network configuration file for bond devices
   become: true
   template:
-    src: 'bond_{{ ansible_os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/ifcfg-{{ item.device }}'
+    src: 'bond_{{ ansible_facts.os_family }}.j2'
+    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/ifcfg-{{ item.device }}'
   with_items: '{{ interfaces_bond_interfaces }}'
   register: bond_result
   notify:
@@ -30,10 +30,10 @@
 - name: RedHat | Write configuration files for rhel route configuration
   become: true
   template:
-    src: 'route_{{ ansible_os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/route-{{ item.device }}'
+    src: 'route_{{ ansible_facts.os_family }}.j2'
+    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/route-{{ item.device }}'
   with_items: '{{ interfaces_bond_interfaces }}'
-  when: item.route is defined and ansible_os_family == 'RedHat'
+  when: item.route is defined and ansible_facts.os_family == 'RedHat'
   register: bond_route_add_result
   notify:
     - Bounce network devices
@@ -41,10 +41,10 @@
 - name: RedHat | Remove configuration files for rhel route configuration
   become: true
   file:
-    path: '{{ interfaces_net_path[ansible_os_family|lower] }}/route-{{ item.device }}'
+    path: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/route-{{ item.device }}'
     state: absent
   with_items: '{{ interfaces_bond_interfaces }}'
-  when: item.route is not defined and ansible_os_family == 'RedHat'
+  when: item.route is not defined and ansible_facts.os_family == 'RedHat'
   register: bond_route_del_result
   notify:
     - Bounce network devices
@@ -52,10 +52,10 @@
 - name: RedHat | Write configuration files for rhel rule configuration
   become: true
   template:
-    src: 'rule_{{ ansible_os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
+    src: 'rule_{{ ansible_facts.os_family }}.j2'
+    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/rule-{{ item.device }}'
   with_items: '{{ interfaces_bond_interfaces }}'
-  when: item.rules is defined and ansible_os_family == 'RedHat'
+  when: item.rules is defined and ansible_facts.os_family == 'RedHat'
   register: bond_rule_add_result
   notify:
     - Bounce network devices
@@ -63,10 +63,10 @@
 - name: RedHat | Remove configuration files for rhel rule configuration
   become: true
   file:
-    path: '{{ interfaces_net_path[ansible_os_family|lower] }}/rule-{{ item.device }}'
+    path: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/rule-{{ item.device }}'
     state: absent
   with_items: '{{ interfaces_bond_interfaces }}'
-  when: item.rules is not defined and ansible_os_family == 'RedHat'
+  when: item.rules is not defined and ansible_facts.os_family == 'RedHat'
   register: bond_rule_del_result
   notify:
     - Bounce network devices
@@ -74,8 +74,8 @@
 - name: Create the network configuration file for slave in the bond devices
   become: true
   template:
-    src: 'bond_slave_{{ ansible_os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_os_family|lower] }}/ifcfg-{{ item.1 }}'
+    src: 'bond_slave_{{ ansible_facts.os_family }}.j2'
+    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/ifcfg-{{ item.1 }}'
   with_subelements:
     - "{{ interfaces_bond_interfaces }}"
     - bond_slaves
