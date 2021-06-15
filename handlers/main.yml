@@ -168,6 +168,8 @@
 # correctly.
 - name: Gather facts
   setup:
+    filter: "{{ interfaces_setup_filter }}"
+    gather_subset: "{{ interfaces_setup_gather_subset }}"
 
 - name: Check active Ethernet interface state
   fail:

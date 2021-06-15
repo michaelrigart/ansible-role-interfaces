@@ -32,6 +32,12 @@ interfaces_bridge_interfaces: []
 
 # The list of bonded interfaces to be added to the system
 interfaces_bond_interfaces: []
+
+# An optional filter parameter to pass to the setup module.
+interfaces_setup_filter: "{{ omit }}"
+
+# An optional gather_subset parameter to pass to the setup module.
+interfaces_setup_gather_subset: "{{ omit }}"
 ```
 
 Note: The values for the list are listed in the examples below.

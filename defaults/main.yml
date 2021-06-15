@@ -31,3 +31,5 @@ interfaces_workaround_centos_remove:
   - ens3-1
   - eth0
 interfaces_pause_time: 0
+interfaces_setup_filter: "{{ omit }}"
+interfaces_setup_gather_subset: "{{ omit }}"
