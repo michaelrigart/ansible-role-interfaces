@@ -5,7 +5,7 @@
 {% set prefix = ('0.0.0.0/' ~ i.netmask) | ipaddr('prefix') %}
 {% set route = i.network ~ '/' ~ prefix %}
 {% if 'gateway' in i %}
-{% set route = route ~ ' via ' ~ i.gateway %}
+{% set route = route ~ ' via ' ~ i.gateway ~ ' dev ' ~ item.device %}
 {% else %}
 {% set route = route ~ ' dev ' ~ item.device %}
 {% endif %}
