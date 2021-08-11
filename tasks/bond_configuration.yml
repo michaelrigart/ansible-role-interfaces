@@ -17,7 +17,7 @@
   become: true
   template:
     src: 'bond_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/ifcfg-{{ item.device }}'
+    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/{{ item | priority }}ifcfg-{{ item.device }}'
   with_items: '{{ interfaces_bond_interfaces }}'
   register: bond_result
   notify:

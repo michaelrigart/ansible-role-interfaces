@@ -97,20 +97,20 @@ def _interface_check(context, interface, interface_type=None):
         elif fact_address and fact_address not in interface.get('allowed_addresses', []):
             return _fail("Interface %s has an IPv4 address but none was "
                          "requested" % device)
-    
+
     # Static IPv6 address
     if interface.get("bootproto") == "static" and interface.get("ip6"):
         fact_address = fact.get("ipv6", [])
         # IP address
         if len(fact_address) == 0:
             return _fail("Interface %s has no IPv6 address" % device)
-        
+
         for item in fact_address:
             if item["address"] == interface["ip6"]["address"] and item["prefix"] == str(interface["ip6"]["prefix"]):
                 break
         else:
             return _fail("Interface %s has incorrect IPv6 address" % device)
-        
+
         # Gateway
         if interface["ip6"].get("gateway"):
             fact_gateway = context["ansible_facts"].get("default_ipv6", {}).get("gateway")
@@ -148,7 +148,7 @@ def bridge_check(context, interface):
     """Check whether the active state of a bridge interface is as requested.
 
     :param context: Jinja2 context.
-    :param interface: An item in interfaces_ether_interfaces.
+    :param interface: An item in interfaces_bridge_interfaces.
     :returns: A dict containing 'diff' and 'reason' items.
     """
     result = _interface_check(context, interface, "bridge")
@@ -180,7 +180,7 @@ def bond_check(context, interface):
     """Check whether the active state of a bond interface is as requested.
 
     :param context: Jinja2 context.
-    :param interface: An item in interfaces_ether_interfaces.
+    :param interface: An item in interfaces_bond_interfaces.
     :returns: A dict containing 'diff' and 'reason' items.
     """
     result = _interface_check(context, interface, "bonding")
@@ -234,6 +234,21 @@ def bond_check(context, interface):
     return result
 
 
+@jinja2.contextfilter
+def priority(context, interface):
+    """
+
+    :param context: Jinja2 context.
+    :param interface: An item in interfaces_[ether,bridge,bond]_interfaces.
+    :returns: The string to prepend to an network interface filename
+    """
+    result = ""
+    if interface["priority"]:
+        result = "{0}-".format(interface["priority"])
+    return result
+
+
+
 class FilterModule(object):
     """Interface comparison filters."""
 
@@ -242,4 +257,5 @@ class FilterModule(object):
             'ether_check': ether_check,
             'bridge_check': bridge_check,
             'bond_check': bond_check,
+            'priority': priority,
         }
