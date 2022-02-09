@@ -26,10 +26,3 @@
     - item not in interfaces_bond_interfaces | map(attribute='device') | list
     - item not in interfaces_bond_interfaces | map(attribute='bond_slaves') | flatten | list
   with_items: "{{ interfaces_workaround_centos_remove }}"
-
-- name: RedHat | ensure network service is started and enabled
-  become: true
-  service:
-    name: network
-    enabled: true
-    state: started

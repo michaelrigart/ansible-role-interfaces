@@ -16,3 +16,6 @@
 - import_tasks: 'ethernet_configuration.yml'
   when: interfaces_ether_interfaces is defined
   tags: configuration
+
+- import_tasks: 'service.yml'
+  tags: service
