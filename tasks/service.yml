@@ -1,0 +1,13 @@
+---
+# NOTE: start the network service after configuring interfaces. This may result
+# in some interfaces being bounced again in handlers, but avoids issues where
+# the initial network configuration is invalid, preventing the service from
+# starting.
+
+- name: RedHat | ensure network service is started and enabled
+  become: true
+  service:
+    name: network
+    enabled: true
+    state: started
+  when: ansible_facts.os_family == 'RedHat'
