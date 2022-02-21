@@ -28,6 +28,9 @@ pre-up {{ item.pre_up }}
 {% if item.bond_mode is defined %}
 bond-mode {{ item.bond_mode }}
 {% endif %}
+{% if item.bond_ad_select is defined %}
+bond-ad_select {{ item.bond_ad_select }}
+{% endif %}
 bond-miimon {{ item.bond_miimon|default(100) }}
 {% if item.bond_lacp_rate is defined %}
 bond-lacp-rate {{ item.bond_lacp_rate }}
