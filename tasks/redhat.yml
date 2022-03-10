@@ -19,6 +19,7 @@
     path: "/etc/sysconfig/network-scripts/ifcfg-{{ item }}"
     state: absent
   when:
+    - item not in ansible_facts.interfaces
     - item not in interfaces_ether_interfaces | map(attribute='device') | list
     - item not in interfaces_bridge_interfaces | map(attribute='device') | list
     - item not in interfaces_bridge_interfaces | map(attribute='ports') | flatten | list
