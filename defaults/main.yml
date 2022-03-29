@@ -15,6 +15,7 @@ interfaces_pkgs:
       - iproute
       - iputils
     '8':
+      - dhcp-client
       - iproute
       - iputils
       - network-scripts
