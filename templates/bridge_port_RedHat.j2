@@ -1,7 +1,7 @@
 # {{ ansible_managed }}
 
 DEVICE={{ item.1 }}
-TYPE=Ethernet
+TYPE={{ (item.1 is match(vlan_interface_regex)) | ternary('Vlan', 'Ethernet') }}
 BOOTPROTO=none
 BRIDGE={{ item.0.device }}
 
