@@ -1,4 +1,5 @@
 ---
+interfaces_use_networkmanager: "{{ ansible_facts.os_family == 'RedHat' and ansible_facts.distribution_major_version | int >= 9 }}"
 
 interfaces_pkgs:
   debian:

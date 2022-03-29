@@ -107,6 +107,12 @@
 # "auto". Interfaces marked with "allow-hotplug" will simply be ignored then.
 #
 
+- name: Bounce networkmanager devices
+  become: true
+  command: nohup nmcli connection reload
+  listen: Bounce network devices
+  when: interfaces_use_networkmanager
+
 - name: Bounce network devices
   become: true
   command: >
@@ -153,6 +159,7 @@
            ether_vlan_interfaces_changed +
            bond_master_interfaces_changed }}
     all_interfaces_changed: "{{ all_interfaces_changed_map[ansible_facts.os_family] }}"
+  when: not interfaces_use_networkmanager
   notify:
     - Pause to wait for interfaces to become active
     - Gather facts

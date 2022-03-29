@@ -5,6 +5,7 @@
     name: '{{  interfaces_pkgs["redhat"][ansible_facts.distribution_major_version] }}'
     state: '{{ interfaces_pkg_state }}'
   tags: package
+  when: not interfaces_use_networkmanager
 
 # CentOS 8 cloud images ship with ifcfg files for ens3 and eth0. ifcfg-ens3
 # seems to be a relic from the image build process, and causes the network
