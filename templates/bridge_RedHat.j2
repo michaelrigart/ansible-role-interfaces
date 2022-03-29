@@ -1,5 +1,6 @@
 # {{ ansible_managed }}
 
+NAME={{ item.device }}
 DEVICE={{ item.device }}
 TYPE=Bridge
 {% if item.hwaddr is defined %}

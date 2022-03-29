@@ -1,5 +1,6 @@
 # {{ ansible_managed }}
 
+NAME={{ item.device }}
 DEVICE={{ item.device }}
 TYPE=Bond
 {% if item.hwaddr is defined %}

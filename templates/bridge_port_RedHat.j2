@@ -1,5 +1,6 @@
 # {{ ansible_managed }}
 
+NAME={{ item.1 }}
 DEVICE={{ item.1 }}
 TYPE={{ (item.1 is match(vlan_interface_regex)) | ternary('Vlan', 'Ethernet') }}
 BOOTPROTO=none

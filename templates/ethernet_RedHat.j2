@@ -1,5 +1,6 @@
 # {{ ansible_managed }}
 
+NAME={{ item.device }}
 DEVICE={{ item.device }}
 TYPE={{ (item.device is match(vlan_interface_regex)) | ternary('Vlan', 'Ethernet') }}
 {% if item.hwaddr is defined %}
