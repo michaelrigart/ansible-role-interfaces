@@ -128,7 +128,7 @@ def _interface_check(context, interface, interface_type=None):
     return _pass()
 
 
-@jinja2.pass_context
+@jinja2.contextfilter
 def ether_check(context, interface):
     """Check whether the active state of an Ethernet interface is as requested.
 
@@ -143,7 +143,7 @@ def ether_check(context, interface):
     return result
 
 
-@jinja2.pass_context
+@jinja2.contextfilter
 def bridge_check(context, interface):
     """Check whether the active state of a bridge interface is as requested.
 
@@ -175,7 +175,7 @@ def bridge_check(context, interface):
     return result
 
 
-@jinja2.pass_context
+@jinja2.contextfilter
 def bond_check(context, interface):
     """Check whether the active state of a bond interface is as requested.
 
