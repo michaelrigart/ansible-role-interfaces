@@ -2,7 +2,11 @@
 
 import re
 
-import jinja2
+# NOTE: jinja2 3.1.0 dropped contextfilter in favour of pass_context.
+try:
+    from jinja2 import pass_context
+except ImportError:
+    from jinja2 import contextfilter as pass_context
 
 
 def _fail(reason):
@@ -128,7 +132,7 @@ def _interface_check(context, interface, interface_type=None):
     return _pass()
 
 
-@jinja2.pass_context
+@pass_context
 def ether_check(context, interface):
     """Check whether the active state of an Ethernet interface is as requested.
 
@@ -143,7 +147,7 @@ def ether_check(context, interface):
     return result
 
 
-@jinja2.pass_context
+@pass_context
 def bridge_check(context, interface):
     """Check whether the active state of a bridge interface is as requested.
 
@@ -175,7 +179,7 @@ def bridge_check(context, interface):
     return result
 
 
-@jinja2.pass_context
+@pass_context
 def bond_check(context, interface):
     """Check whether the active state of a bond interface is as requested.
 
