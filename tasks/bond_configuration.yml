@@ -79,6 +79,7 @@
   with_subelements:
     - "{{ interfaces_bond_interfaces }}"
     - bond_slaves
+  when: interfaces_bond_setup_slaves
   register: bond_slave_result
   notify:
     - Bounce network devices
