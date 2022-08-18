@@ -35,6 +35,9 @@ bridge_stp {{ item.stp }}
 {% if item.fd is defined %}
 bridge_fd {{ item.fd }}
 {% endif %}
+{% if item.vlan_aware is defined %}
+bridge-vlan-aware {{ item.vlan_aware }}
+{% endif %}
 
 {% if item.route is defined %}
 {% for i in item.route %}
