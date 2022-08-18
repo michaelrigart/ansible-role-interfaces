@@ -32,6 +32,9 @@ bridge_ports {{ item.ports|join(' ') }}{% if item.ports | default([], true) | le
 {% if item.stp is defined %}
 bridge_stp {{ item.stp }}
 {% endif %}
+{% if item.fd is defined %}
+bridge_fd {{ item.fd }}
+{% endif %}
 
 {% if item.route is defined %}
 {% for i in item.route %}
