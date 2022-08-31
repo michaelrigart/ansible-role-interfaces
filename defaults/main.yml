@@ -34,3 +34,4 @@ interfaces_workaround_centos_remove:
 interfaces_pause_time: 0
 interfaces_setup_filter: "{{ omit }}"
 interfaces_setup_gather_subset: "{{ omit }}"
+interfaces_bond_setup_slaves: true
