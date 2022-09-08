@@ -17,5 +17,14 @@
   when: interfaces_ether_interfaces is defined
   tags: configuration
 
+- name: Debian | Merge configuration in interface file
+  assemble:
+    src: "{{ interfaces_net_path['debian'] }}"
+    dest: /etc/network/interfaces
+  tags: configuration
+  when:
+    - ansible_facts.os_family | lower == 'debian'
+    - interfaces_merge
+
 - import_tasks: 'service.yml'
   tags: service

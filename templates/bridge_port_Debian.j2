@@ -1,4 +1,6 @@
-# {{ ansible_managed }}
+{% if not interfaces_merge %}# {{ ansible_managed }}
+{% else %}# Bridge Port - {{ item.0.device }}/{{ item.1 }}
+{% endif %}
 
 auto {{ item.1 }}
 iface {{ item.1 }}  inet manual

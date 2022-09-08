@@ -1,4 +1,6 @@
-# {{ ansible_managed }}
+{% if not interfaces_merge %}# {{ ansible_managed }}
+{% else %}# Bridge - {{ item.device }}
+{% endif %}
 
 auto {{ item.device }}
 {% if item.bootproto == 'dhcp' %}
@@ -39,7 +41,7 @@ bridge_fd {{ item.fd }}
 bridge-vlan-aware {{ item.vlan_aware }}
 {% endif %}
 
-{% if item.route is defined %}
+{%- if item.route is defined %}
 {% for i in item.route %}
 {# Workaround for Ansible bug https://github.com/ansible/ansible/issues/17872. #}
 {% set prefix = ('0.0.0.0/' ~ i.netmask) | ipaddr('prefix') %}
@@ -60,7 +62,7 @@ down ip route del {{ route }}
 {% endfor %}
 {% endif %}
 
-{% if item.rules is defined %}
+{%- if item.rules is defined %}
 {% for rule in item.rules %}
 up ip rule add {{ rule }}
 down ip rule del {{ rule }}
