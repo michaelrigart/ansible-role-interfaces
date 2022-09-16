@@ -231,7 +231,7 @@ def bond_check(context, interface):
 
     for slave in interface_slaves:
         slave_interface = {"device": slave}
-        result = _interface_check(context, slave_interface, "ether")
+        result = _interface_check(context, slave_interface)
         if result["diff"]:
             return result
 
