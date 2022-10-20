@@ -1,5 +1,4 @@
 ---
-
 - name: Check active bond interface state
   debug:
     msg: >
@@ -33,7 +32,9 @@
     src: 'route_{{ ansible_facts.os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/route-{{ item.device }}'
   with_items: '{{ interfaces_bond_interfaces }}'
-  when: item.route is defined and ansible_facts.os_family == 'RedHat'
+  when:
+    - item.route is defined
+    - ansible_facts.os_family == 'RedHat'
   register: bond_route_add_result
   notify:
     - Bounce network devices
@@ -44,7 +45,9 @@
     path: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/route-{{ item.device }}'
     state: absent
   with_items: '{{ interfaces_bond_interfaces }}'
-  when: item.route is not defined and ansible_facts.os_family == 'RedHat'
+  when:
+    - item.route is not defined
+    - ansible_facts.os_family == 'RedHat'
   register: bond_route_del_result
   notify:
     - Bounce network devices
@@ -55,7 +58,9 @@
     src: 'rule_{{ ansible_facts.os_family }}.j2'
     dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/rule-{{ item.device }}'
   with_items: '{{ interfaces_bond_interfaces }}'
-  when: item.rules is defined and ansible_facts.os_family == 'RedHat'
+  when:
+    - item.rules is defined
+    - ansible_facts.os_family == 'RedHat'
   register: bond_rule_add_result
   notify:
     - Bounce network devices
@@ -66,7 +71,9 @@
     path: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/rule-{{ item.device }}'
     state: absent
   with_items: '{{ interfaces_bond_interfaces }}'
-  when: item.rules is not defined and ansible_facts.os_family == 'RedHat'
+  when:
+    - item.rules is not defined
+    - ansible_facts.os_family == 'RedHat'
   register: bond_rule_del_result
   notify:
     - Bounce network devices
@@ -79,7 +86,8 @@
   with_subelements:
     - "{{ interfaces_bond_interfaces }}"
     - bond_slaves
-  when: interfaces_bond_setup_slaves
+  when:
+    - interfaces_bond_setup_slaves
   register: bond_slave_result
   notify:
     - Bounce network devices
