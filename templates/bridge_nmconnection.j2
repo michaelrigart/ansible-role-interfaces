@@ -1,0 +1,67 @@
+# {{ ansible_managed }}
+
+[connection]
+id={{ item.device }}
+type=bridge
+interface-name={{ item.device }}
+{% if item.zone is defined %}
+zone={{ item.zone }}
+{% endif %}
+
+{% if item.mtu is defined %}
+[ethernet]
+mtu={{ item.mtu }}
+{% endif %}
+
+[bridge]
+interface-name={{ item.device }}
+{% if item.stp is defined %}
+stp={{ item.stp }}
+{% endif %}
+
+[ipv4]
+{% if item.bootproto == 'dhcp' %}
+method=auto
+{% elif item.bootproto == 'static' and item.address is defined and item.address | length %}
+method=manual
+{%   if item.netmask is defined %}
+address1={{ (item.address ~'/'~ item.netmask) | ipaddr('host/prefix') }}
+{%   endif %}
+{%   if item.gateway is defined and item.gateway | length %}
+gateway={{ item.gateway }}
+{%   endif %}
+{% else %}
+method=disabled
+{% endif %}
+{% if item.route is defined %}
+{%   for i in item.route %}
+{%     if 'gateway' in i %}
+route{{ loop.index }}={{ (i.network ~'/'~ i.netmask) | ipaddr('network/prefix') }},{{ i.gateway }}
+{%     endif %}
+{#     TODO: dev, table, options #}
+{%   endfor %}
+{% endif %}
+{% if item.dnsnameservers is defined %}
+dns={{ item.dnsnameservers | join(',') }}
+{% endif %}
+
+[ipv6]
+{% if item.ip6 is defined %}
+method={{ (item.bootproto == 'static') | ternary('manual', 'auto') }}
+{%   if item.ip6.address is defined and item.ip6.netmask is defined %}
+address1={{ (item.ip6.address ~'/'~ item.ip6.netmask) | ipaddr('host/prefix') }}
+{%   endif %}
+{%   if item.ip6.gateway is defined %}
+gateway={{ item.ip6.gateway }}
+{%   endif %}
+{%   if item.ip6.route is defined %}
+{%     for i in item.ip6.route %}
+{%       if 'gateway' in i %}
+route{{ loop.index }}={{ (i.network ~'/'~ i.netmask) | ipaddr('network/prefix') }},{{ i.gateway }}
+{%       endif %}
+{#       TODO: dev, table, options #}
+{%     endfor %}
+{%   endif %}
+{% else %}
+method=disabled
+{% endif %}

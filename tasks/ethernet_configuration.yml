@@ -15,8 +15,9 @@
 - name: Create the network configuration file for ethernet devices
   become: true
   template:
-    src: 'ethernet_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path }}/ifcfg-{{ item.device }}'
+    src: "ethernet_{{ interfaces_use_nmconnection | ternary('nmconnection', ansible_facts.os_family) }}.j2"
+    dest: "{{ interfaces_net_path }}/{{ interfaces_use_nmconnection | ternary(item.device ~ '.nmconnection', 'ifcfg-' ~ item.device) }}"
+    mode: "{{ interfaces_use_nmconnection | ternary('0600', omit) }}"
   with_items: '{{ interfaces_ether_interfaces }}'
   register: ether_result
   notify:
@@ -31,6 +32,7 @@
   when:
     - item.route is defined
     - ansible_facts.os_family == 'RedHat'
+    - not interfaces_use_nmconnection
   register: ether_route_add_result
   notify:
     - Bounce network devices
@@ -45,6 +47,7 @@
     - item.ip6 is defined
     - item.ip6.route is defined
     - ansible_facts.os_family == 'RedHat'
+    - not interfaces_use_nmconnection
   register: ether_route6_add_result
   notify:
     - Bounce network devices
@@ -56,7 +59,7 @@
     state: absent
   with_items: '{{ interfaces_ether_interfaces }}'
   when:
-    - item.route is not defined
+    - item.route is not defined or interfaces_use_nmconnection
     - ansible_facts.os_family == 'RedHat'
   register: ether_route_del_result
   notify:
@@ -69,7 +72,7 @@
     state: absent
   with_items: '{{ interfaces_ether_interfaces }}'
   when:
-    - item.ip6 is not defined
+    - item.ip6 is not defined or interfaces_use_nmconnection
     - ansible_facts.os_family == 'RedHat'
   register: ether_route6_del_result
   notify:
@@ -84,6 +87,7 @@
   when:
     - item.rules is defined
     - ansible_facts.os_family == 'RedHat'
+    - not interfaces_use_nmconnection
   register: ether_rule_add_result
   notify:
     - Bounce network devices
@@ -95,7 +99,7 @@
     state: absent
   with_items: '{{ interfaces_ether_interfaces }}'
   when:
-    - item.rules is not defined
+    - item.rules is not defined or interfaces_use_nmconnection
     - ansible_facts.os_family == 'RedHat'
   register: ether_rule_del_result
   notify:

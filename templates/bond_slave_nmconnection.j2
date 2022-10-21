@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+
+[connection]
+id={{ item.1 }}
+type=ethernet
+interface-name={{ item.1 }}
+
+master={{ item.0.device }}
+slave-type=bond

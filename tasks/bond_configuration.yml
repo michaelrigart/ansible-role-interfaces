@@ -15,8 +15,9 @@
 - name: Create the network configuration file for bond devices
   become: true
   template:
-    src: 'bond_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path }}/ifcfg-{{ item.device }}'
+    src: "bond_{{ interfaces_use_nmconnection | ternary('nmconnection', ansible_facts.os_family) }}.j2"
+    dest: "{{ interfaces_net_path }}/{{ interfaces_use_nmconnection | ternary(item.device ~ '.nmconnection', 'ifcfg-' ~ item.device) }}"
+    mode: "{{ interfaces_use_nmconnection | ternary('0600', omit) }}"
   with_items: '{{ interfaces_bond_interfaces }}'
   register: bond_result
   notify:
@@ -35,6 +36,7 @@
   when:
     - item.route is defined
     - ansible_facts.os_family == 'RedHat'
+    - not interfaces_use_nmconnection
   register: bond_route_add_result
   notify:
     - Bounce network devices
@@ -46,7 +48,7 @@
     state: absent
   with_items: '{{ interfaces_bond_interfaces }}'
   when:
-    - item.route is not defined
+    - item.route is not defined or interfaces_use_nmconnection
     - ansible_facts.os_family == 'RedHat'
   register: bond_route_del_result
   notify:
@@ -61,6 +63,7 @@
   when:
     - item.rules is defined
     - ansible_facts.os_family == 'RedHat'
+    - not interfaces_use_nmconnection
   register: bond_rule_add_result
   notify:
     - Bounce network devices
@@ -72,7 +75,7 @@
     state: absent
   with_items: '{{ interfaces_bond_interfaces }}'
   when:
-    - item.rules is not defined
+    - item.rules is not defined or interfaces_use_nmconnection
     - ansible_facts.os_family == 'RedHat'
   register: bond_rule_del_result
   notify:
@@ -81,8 +84,9 @@
 - name: Create the network configuration file for slave in the bond devices
   become: true
   template:
-    src: 'bond_slave_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path }}/ifcfg-{{ item.1 }}'
+    src: "bond_slave_{{ interfaces_use_nmconnection | ternary('nmconnection', ansible_facts.os_family) }}.j2"
+    dest: "{{ interfaces_net_path }}/{{ interfaces_use_nmconnection | ternary(item.1 ~ '.nmconnection', 'ifcfg-' ~ item.1) }}"
+    mode: "{{ interfaces_use_nmconnection | ternary('0600', omit) }}"
   with_subelements:
     - "{{ interfaces_bond_interfaces }}"
     - bond_slaves

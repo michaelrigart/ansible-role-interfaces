@@ -1,0 +1,21 @@
+# {{ ansible_managed }}
+
+[connection]
+id={{ item.1 }}
+type={{ (item.1 is match(vlan_interface_regex)) | ternary('vlan', 'ethernet') }}
+interface-name={{ item.1 }}
+
+master={{ item.0.device }}
+slave-type=bridge
+
+{% if item.0.mtu is defined %}
+[ethernet]
+mtu={{ item.0.mtu }}
+{% endif %}
+
+{% if item.1 is match(vlan_interface_regex) %}
+[vlan]
+interface-name={{ item.1 }}
+parent={{ item.1 | regex_replace(vlan_interface_regex, '\g<interface>') }}
+id={{ item.1 | regex_replace(vlan_interface_regex, '\g<vlan_id>') }}
+{% endif %}

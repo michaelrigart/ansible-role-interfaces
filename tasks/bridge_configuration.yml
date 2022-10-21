@@ -15,8 +15,9 @@
 - name: Create the network configuration file for bridge devices
   become: true
   template:
-    src: 'bridge_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path }}/ifcfg-{{ item.device }}'
+    src: "bridge_{{ interfaces_use_nmconnection | ternary('nmconnection', ansible_facts.os_family) }}.j2"
+    dest: "{{ interfaces_net_path }}/{{ interfaces_use_nmconnection | ternary(item.device ~ '.nmconnection', 'ifcfg-' ~ item.device) }}"
+    mode: "{{ interfaces_use_nmconnection | ternary('0600', omit) }}"
   with_items: '{{ interfaces_bridge_interfaces }}'
   register: bridge_result
   notify:
@@ -31,6 +32,7 @@
   when:
     - item.route is defined
     - ansible_facts.os_family == 'RedHat'
+    - not interfaces_use_nmconnection
   register: bridge_route_add_result
   notify:
     - Bounce network devices
@@ -42,7 +44,7 @@
     state: absent
   with_items: '{{ interfaces_bridge_interfaces }}'
   when:
-    - item.route is not defined
+    - item.route is not defined or interfaces_use_nmconnection
     - ansible_facts.os_family == 'RedHat'
   register: bridge_route_del_result
   notify:
@@ -57,6 +59,7 @@
   when:
     - item.rules is defined
     - ansible_facts.os_family == 'RedHat'
+    - not interfaces_use_nmconnection
   register: bridge_rule_add_result
   notify:
     - Bounce network devices
@@ -68,7 +71,7 @@
     state: absent
   with_items: '{{ interfaces_bridge_interfaces }}'
   when:
-    - item.rules is not defined
+    - item.rules is not defined or interfaces_use_nmconnection
     - ansible_facts.os_family == 'RedHat'
   register: bridge_rule_del_result
   notify:
@@ -77,8 +80,9 @@
 - name: Create the network configuration file for port on the bridge devices
   become: true
   template:
-    src: 'bridge_port_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path }}/ifcfg-{{ item.1 }}'
+    src: "bridge_port_{{ interfaces_use_nmconnection | ternary('nmconnection', ansible_facts.os_family) }}.j2"
+    dest: "{{ interfaces_net_path }}/{{ interfaces_use_nmconnection | ternary(item.1 ~ '.nmconnection', 'ifcfg-' ~ item.1) }}"
+    mode: "{{ interfaces_use_nmconnection | ternary('0600', omit) }}"
   with_subelements:
     - "{{ interfaces_bridge_interfaces }}"
     - ports
