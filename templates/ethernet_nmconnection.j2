@@ -2,7 +2,7 @@
 
 [connection]
 id={{ item.device }}
-type={{ (item.device is match(vlan_interface_regex)) | ternary('vlan', 'ethernet') }}
+type={{ ('vlan' if item.device is match(vlan_interface_regex) else 'dummy' if item.device is match(dummy_interface_regex) else 'ethernet') }}
 interface-name={{ item.device }}
 {% if item.zone is defined %}
 zone={{ item.zone }}

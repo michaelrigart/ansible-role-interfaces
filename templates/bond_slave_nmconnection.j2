@@ -2,7 +2,7 @@
 
 [connection]
 id={{ item.1 }}
-type=ethernet
+type={{ (item.1 is match(dummy_interface_regex)) | ternary('dummy', 'ethernet') }}
 interface-name={{ item.1 }}
 
 master={{ item.0.device }}

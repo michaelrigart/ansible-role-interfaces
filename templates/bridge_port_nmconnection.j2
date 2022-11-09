@@ -2,7 +2,7 @@
 
 [connection]
 id={{ item.1 }}
-type={{ (item.1 is match(vlan_interface_regex)) | ternary('vlan', 'ethernet') }}
+type={{ ('vlan' if item.1 is match(vlan_interface_regex) else 'dummy' if item.1 is match(dummy_interface_regex) else 'ethernet') }}
 interface-name={{ item.1 }}
 
 master={{ item.0.device }}

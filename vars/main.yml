@@ -6,3 +6,6 @@ vlan_interface_regex: '(?P<interface>.*)\.(?P<vlan_id>\d{1,4})'
 # Regular expression matching the '.<VLAN ID>' suffix of a VLAN interface of
 # the form '<interface>.<VLAN ID>'.
 vlan_interface_suffix_regex: '\.\d{1,4}'
+
+# Regular expression matching a dummy interface base on name
+dummy_interface_regex: 'dummy*'
