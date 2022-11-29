@@ -38,6 +38,10 @@ interfaces_setup_filter: "{{ omit }}"
 
 # An optional gather_subset parameter to pass to the setup module.
 interfaces_setup_gather_subset: "{{ omit }}"
+
+# An option to merge all configurations setup with merge: true
+# in the global interfaces file (Debian-Family only)
+interfaces_merge: false
 ```
 
 Note: The values for the list are listed in the examples below.

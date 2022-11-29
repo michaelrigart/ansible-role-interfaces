@@ -1,4 +1,6 @@
-# {{ ansible_managed }}
+{% if not interfaces_merge %}# {{ ansible_managed }}
+{% else %}# Ethernet - {{ item.device }}
+{% endif %}
 
 {{ item.allowclass | default('auto') }} {{ item.device }}
 {% if item.bootproto == 'dhcp' %}

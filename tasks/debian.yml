@@ -41,6 +41,7 @@
     group: root
     mode: 0644
   tags: configuration
+  when: not interfaces_merge
 
 - name: Debian | Create the directory for interface cfg files
   become: true
@@ -48,3 +49,14 @@
     path: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}'
     state: directory
   tags: configuration
+
+- name: Debian | Ensure lo single configuration file
+  copy:
+    dest: /etc/network/interfaces.d/ifcfg-lo
+    mode: 0644
+    content: |
+      # Loopback
+
+      auto lo
+      iface lo inet loopback
+  when: interfaces_merge

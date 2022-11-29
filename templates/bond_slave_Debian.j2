@@ -1,5 +1,9 @@
-# {{ ansible_managed }}
+{% if not interfaces_merge %}# {{ ansible_managed }}
+{% else %}# Bond Slave - {{ item.0.device }}/{{ item.1 }}
+{% endif %}
 
 auto {{ item.1 }}
 iface {{ item.1 }} inet manual
+{% if ansible_facts.distribution_major_version | int < 11 %}
 bond-master {{ item.0.device }}
+{% endif %}
