@@ -2,7 +2,7 @@
 - name: RedHat | install current/latest network packages versions
   become: true
   package:
-    name: '{{  interfaces_pkgs["redhat"][ansible_facts.distribution_major_version] }}'
+    name: '{{  interfaces_pkgs }}'
     state: '{{ interfaces_pkg_state }}'
   tags: package
   when: not interfaces_use_networkmanager

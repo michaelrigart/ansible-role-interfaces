@@ -1,0 +1,8 @@
+---
+interfaces_pkgs:
+  - dhcp-client
+  - iproute
+  - iputils
+  - network-scripts
+
+interfaces_net_path: /etc/sysconfig/network-scripts

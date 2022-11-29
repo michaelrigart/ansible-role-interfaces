@@ -1,28 +1,6 @@
 ---
 interfaces_use_networkmanager: "{{ ansible_facts.os_family == 'RedHat' and ansible_facts.distribution_major_version | int >= 9 }}"
 
-interfaces_pkgs:
-  debian:
-    - python{% if ansible_facts.python.version.major >= 3 %}3{% endif %}-selinux
-    - bridge-utils
-    - ifenslave
-    - ifupdown
-    - iproute2
-    - resolvconf
-  redhat:
-    '7':
-      - libselinux-python
-      - bridge-utils
-      - iproute
-      - iputils
-    '8':
-      - dhcp-client
-      - iproute
-      - iputils
-      - network-scripts
-interfaces_net_path:
-  debian: /etc/network/interfaces.d
-  redhat: /etc/sysconfig/network-scripts
 interfaces_pkg_state: present
 interfaces_route_tables: []
 interfaces_ether_interfaces: []

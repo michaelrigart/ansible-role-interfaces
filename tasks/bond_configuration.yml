@@ -16,7 +16,7 @@
   become: true
   template:
     src: 'bond_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/ifcfg-{{ item.device }}'
+    dest: '{{ interfaces_net_path }}/ifcfg-{{ item.device }}'
   with_items: '{{ interfaces_bond_interfaces }}'
   register: bond_result
   notify:
@@ -30,7 +30,7 @@
   become: true
   template:
     src: 'route_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/route-{{ item.device }}'
+    dest: '{{ interfaces_net_path }}/route-{{ item.device }}'
   with_items: '{{ interfaces_bond_interfaces }}'
   when:
     - item.route is defined
@@ -42,7 +42,7 @@
 - name: RedHat | Remove configuration files for rhel route configuration
   become: true
   file:
-    path: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/route-{{ item.device }}'
+    path: '{{ interfaces_net_path }}/route-{{ item.device }}'
     state: absent
   with_items: '{{ interfaces_bond_interfaces }}'
   when:
@@ -56,7 +56,7 @@
   become: true
   template:
     src: 'rule_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/rule-{{ item.device }}'
+    dest: '{{ interfaces_net_path }}/rule-{{ item.device }}'
   with_items: '{{ interfaces_bond_interfaces }}'
   when:
     - item.rules is defined
@@ -68,7 +68,7 @@
 - name: RedHat | Remove configuration files for rhel rule configuration
   become: true
   file:
-    path: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/rule-{{ item.device }}'
+    path: '{{ interfaces_net_path }}/rule-{{ item.device }}'
     state: absent
   with_items: '{{ interfaces_bond_interfaces }}'
   when:
@@ -82,7 +82,7 @@
   become: true
   template:
     src: 'bond_slave_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/ifcfg-{{ item.1 }}'
+    dest: '{{ interfaces_net_path }}/ifcfg-{{ item.1 }}'
   with_subelements:
     - "{{ interfaces_bond_interfaces }}"
     - bond_slaves
