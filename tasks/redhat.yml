@@ -27,3 +27,20 @@
     - item not in interfaces_bond_interfaces | map(attribute='device') | list
     - item not in interfaces_bond_interfaces | map(attribute='bond_slaves') | flatten | list
   with_items: "{{ interfaces_workaround_centos_remove }}"
+
+# When using NetworkManager with system-connections store, existing ifcfg files
+# need to be removed, otherwise they shadow our nmconnection files. We do this
+# only for interfaces that we manage in this role.
+- name: RedHat | remove network-scripts/ifcfg configuration for NM/system-connections
+  become: true
+  file:
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ item }}"
+    state: absent
+  when:
+    - interfaces_use_nmconnection
+  with_items:
+    - "{{ interfaces_ether_interfaces | map(attribute='device') | list }}"
+    - "{{ interfaces_bridge_interfaces | map(attribute='device') | list }}"
+    - "{{ interfaces_bridge_interfaces | map(attribute='ports') | flatten | list }}"
+    - "{{ interfaces_bond_interfaces | map(attribute='device') | list }}"
+    - "{{ interfaces_bond_interfaces | map(attribute='bond_slaves') | flatten | list }}"
