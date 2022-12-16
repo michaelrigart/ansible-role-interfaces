@@ -52,6 +52,9 @@ bond-updelay {{ item.bond_updelay }}
 {% if item.bond_xmit_hash_policy is defined %}
 bond-xmit-hash-policy {{ item.bond_xmit_hash_policy }}
 {% endif %}
+{% if item.bond_primary is defined %}
+bond-primary {{ item.bond_primary }}
+{% endif %}
 {% if item.bond_slaves is defined and item.bond_mode | default == 'active-backup' %}
 bond-slaves none
 {% endif %}
