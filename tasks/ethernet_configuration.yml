@@ -55,7 +55,7 @@
 - name: RedHat | Remove configuration files for rhel route configuration
   become: true
   file:
-    path: '{{ interfaces_net_path }}/route-{{ item.device }}'
+    path: '/etc/sysconfig/network-scripts/route-{{ item.device }}'
     state: absent
   with_items: '{{ interfaces_ether_interfaces }}'
   when:
@@ -68,7 +68,7 @@
 - name: RedHat | Remove configuration files for rhel v6 route configuration
   become: true
   file:
-    path: '{{ interfaces_net_path }}/route6-{{ item.device }}'
+    path: '/etc/sysconfig/network-scripts/route6-{{ item.device }}'
     state: absent
   with_items: '{{ interfaces_ether_interfaces }}'
   when:
@@ -95,7 +95,7 @@
 - name: RedHat | Remove configuration files for rhel rule configuration
   become: true
   file:
-    path: '{{ interfaces_net_path }}/rule-{{ item.device }}'
+    path: '/etc/sysconfig/network-scripts/rule-{{ item.device }}'
     state: absent
   with_items: '{{ interfaces_ether_interfaces }}'
   when:
