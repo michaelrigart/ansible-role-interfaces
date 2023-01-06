@@ -109,9 +109,46 @@
 
 - name: Bounce networkmanager devices
   become: true
-  command: nohup nmcli connection reload
+  command: >
+    nohup bash -c "
+    nmcli connection reload;
+
+    returncode=0
+    {% for interface in all_interfaces_changed | reverse %}
+    nmcli connection down {{ interface }};
+    {% endfor %}
+
+    {% for interface in all_interfaces_changed %}
+    if ! nmcli connection up {{ interface }}; then
+      echo \"Failed to bring up interface {{ interface }}\";
+      returncode=1
+    fi;
+    {% endfor %}
+
+    exit $returncode"
+  vars:
+    ether_vlan_interfaces_changed: >
+      {{ ether_interfaces_changed | select('match', vlan_interface_regex) | list}}
+    ether_non_vlan_interfaces_changed: >
+      {{ ether_interfaces_changed | reject('match', vlan_interface_regex) | list }}
+    bridge_port_vlan_interfaces_changed: >
+      {{ bridge_port_interfaces_changed | select('match', vlan_interface_regex) | list}}
+    bridge_port_non_vlan_interfaces_changed: >
+      {{ bridge_port_interfaces_changed | reject('match', vlan_interface_regex) | list }}
+    all_interfaces_changed: >
+        {{ ether_non_vlan_interfaces_changed +
+           bridge_interfaces_changed +
+           bond_master_interfaces_changed +
+           bridge_port_interfaces_changed +
+           bond_slave_interfaces_changed +
+           ether_vlan_interfaces_changed }}
   listen: Bounce network devices
   when: interfaces_use_networkmanager
+  notify:
+    - Gather facts
+    - Check active Ethernet interface state
+    - Check active bond interface state
+    - Check active bridge interface state
 
 - name: Bounce network devices
   become: true
