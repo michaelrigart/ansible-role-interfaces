@@ -7,6 +7,18 @@
   tags: package
   when: not interfaces_use_networkmanager
 
+- name: RedHat | install NM-dispatcher-routing-rules
+  become: true
+  package:
+    name: NetworkManager-dispatcher-routing-rules
+    state: '{{ interfaces_pkg_state }}'
+  tags: package
+  when:
+    - interfaces_use_networkmanager
+    - not interfaces_use_nmconnection
+    - interfaces_route_tables | length > 0
+  notify: Restart NetworkManager
+
 # CentOS 8 cloud images ship with ifcfg files for ens3 and eth0. ifcfg-ens3
 # seems to be a relic from the image build process, and causes the network
 # service to fail. ifcfg-eth0 is useful for most virtual machines, but if a

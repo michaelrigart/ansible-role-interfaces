@@ -69,12 +69,31 @@ method=disabled
 {%       set _ = route_options.append(option) %}
 {%     endif %}
 {%   endfor %}
+{#   TODO: dev #}
 {%   if 'gateway' in route %}
 route{{ loop.index }}={{ (route.network ~'/'~ route.netmask) | ipaddr('network/prefix') }},{{ route.gateway }}
 {%   endif %}
-{#   TODO: dev, table #}
+{%   if 'table' in route %}
+{#     networkmanager wants a table id, so we need to find it in interfaces_route_tables #}
+{%     set table_id = (interfaces_route_tables | selectattr('name', 'equalto', route.table) | first).id %}
+{%     set _ = route_options.append('table=' ~ table_id) %}
+{%   endif %}
 {%   if route_options | length %}
 route{{ loop.index }}_options={{ route_options | join(',') }}
+{%   endif %}
+{% endfor %}
+{% for rule in item.rules | default([]) %}
+{%   if rule is mapping %}
+{#     networkmanager wants a table id, so we need to find it in interfaces_route_tables #}
+{%     set table_id = (interfaces_route_tables | selectattr('name', 'equalto', rule.table) | first).id %}
+{%     if rule.to is defined %}
+routing-rule{{ loop.index }}=priority {{ rule.priority | default(32765 - loop.index0) }} to {{ rule.to }} table {{ table_id }}
+{%     endif %}
+{%     if rule.from is defined %}
+routing-rule{{ loop.index }}=priority {{ rule.priority | default(32765 - loop.index0) }} from {{ rule.from }} table {{ table_id }}
+{%     endif %}
+{%   else %}
+routing-rule{{ loop.index }}=priority {{ 32765 - loop.index0 }} {{ rule }}
 {%   endif %}
 {% endfor %}
 {% if item.dnsnameservers is defined %}

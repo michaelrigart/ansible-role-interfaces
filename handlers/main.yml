@@ -150,6 +150,14 @@
     - Check active bond interface state
     - Check active bridge interface state
 
+# The order handlers execute are based on the order they're arranged here.
+# We want to do a controlled bounce of interfaces before we do any restart.
+- name: Restart NetworkManager
+  become: true
+  service:
+    name: NetworkManager
+    state: restarted
+
 - name: Bounce network devices
   become: true
   command: >

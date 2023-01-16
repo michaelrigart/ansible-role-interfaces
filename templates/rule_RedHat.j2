@@ -1,5 +1,14 @@
 # {{ ansible_managed }}
 
 {% for rule in item.rules %}
+{%   if rule is mapping %}
+{%     if rule.to is defined %}
+to {{ rule.to }} table {{ rule.table }}
+{%     endif %}
+{%     if rule.from is defined %}
+from {{ rule.from }} table {{ rule.table }}
+{%     endif %}
+{%   else %}
 {{ rule }}
+{%   endif %}
 {% endfor %}
