@@ -1,8 +1,7 @@
 # {{ ansible_managed }}
 
 {% if item.ip6 is defined %}
-{% if item.ip6.route is defined %}
-{% for i in item.ip6.route %}
+{% for i in item.ip6.route | default([]) %}
 {% set route = i.network %}
 {% if 'gateway' in i %}
 {% set route = route ~ ' via ' ~ i.gateway %}
@@ -17,5 +16,4 @@
 {% endif %}
 {{ route }}
 {% endfor %}
-{% endif %}
 {% endif %}

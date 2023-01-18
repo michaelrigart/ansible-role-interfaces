@@ -1,6 +1,6 @@
 # {{ ansible_managed }}
 
-{% for i in item.route %}
+{% for i in item.route | default([]) %}
 {# Workaround for Ansible bug https://github.com/ansible/ansible/issues/17872. #}
 {% set prefix = ('0.0.0.0/' ~ i.netmask) | ipaddr('prefix') %}
 {% set route = i.network ~ '/' ~ prefix %}

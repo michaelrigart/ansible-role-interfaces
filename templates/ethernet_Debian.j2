@@ -86,8 +86,7 @@ gateway {{ item.ip6.gateway }}
 {% endif %}
 {% if item.ip6 is defined %}
 
-{% if item.ip6.route is defined %}
-{% for i in item.ip6.route %}
+{% for i in item.ip6.route | default([]) %}
 {% set route = i.network %}
 {% if 'gateway' in i %}
 {% set route = route ~ ' via ' ~ i.gateway %}
@@ -103,5 +102,4 @@ gateway {{ item.ip6.gateway }}
 up ip -6 route add {{ route }}
 down ip -6 route del {{ route }}
 {% endfor %}
-{% endif %}
 {% endif %}

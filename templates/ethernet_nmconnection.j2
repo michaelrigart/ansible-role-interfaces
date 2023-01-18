@@ -41,14 +41,12 @@ gateway={{ item.gateway }}
 {% else %}
 method=disabled
 {% endif %}
-{% if item.route is defined %}
-{%   for i in item.route %}
-{%     if 'gateway' in i %}
-route{{ loop.index }}={{ (i.network ~'/'~ i.netmask) | ipaddr('network/prefix') }},{{ i.gateway }}
-{%     endif %}
-{#     TODO: dev, table, options #}
-{%   endfor %}
-{% endif %}
+{% for route in item.route | default([]) %}
+{%   if 'gateway' in route %}
+route{{ loop.index }}={{ (route.network ~'/'~ route.netmask) | ipaddr('network/prefix') }},{{ route.gateway }}
+{%   endif %}
+{#   TODO: dev, table, options #}
+{% endfor %}
 {% if item.dnsnameservers is defined %}
 dns={{ item.dnsnameservers | join(',') }}
 {% endif %}
@@ -62,14 +60,12 @@ address1={{ (item.ip6.address ~'/'~ item.ip6.netmask) | ipaddr('host/prefix') }}
 {%   if item.ip6.gateway is defined %}
 gateway={{ item.ip6.gateway }}
 {%   endif %}
-{%   if item.ip6.route is defined %}
-{%     for i in item.ip6.route %}
-{%       if 'gateway' in i %}
-route{{ loop.index }}={{ (i.network ~'/'~ i.netmask) | ipaddr('network/prefix') }},{{ i.gateway }}
-{%       endif %}
-{#       TODO: dev, table, options #}
-{%     endfor %}
-{%   endif %}
+{%   for route in item.ip6.route | default([]) %}
+{%     if 'gateway' in route %}
+route{{ loop.index }}={{ (route.network ~'/'~ route.netmask) | ipaddr('network/prefix') }},{{ route.gateway }}
+{%     endif %}
+{#     TODO: dev, table, options #}
+{%   endfor %}
 {% else %}
 method=disabled
 {% endif %}
