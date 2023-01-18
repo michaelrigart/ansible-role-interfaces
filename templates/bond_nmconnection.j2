@@ -56,10 +56,26 @@ gateway={{ item.gateway }}
 method=disabled
 {% endif %}
 {% for route in item.route | default([]) %}
+{%   set route_options = [] %}
+{%   for option in route.options | default([]) %}
+{%     if option is mapping %}
+{#       We're gonna assume it's a mapping of one key with value, and     #}
+{#       since dict2items returns a array, we're selecting the first item #}
+{%       set option = option | dict2items | first %}
+{%       set _ = route_options.append(option.key ~ '=' ~ option.value) %}
+{%     elif option in ['onlink', 'lock-window', 'lock-cwdn', 'lock-mtu'] %}
+{%       set _ = route_options.append(option ~ '=true') %}
+{%     else %}
+{%       set _ = route_options.append(option) %}
+{%     endif %}
+{%   endfor %}
 {%   if 'gateway' in route %}
 route{{ loop.index }}={{ (route.network ~'/'~ route.netmask) | ipaddr('network/prefix') }},{{ route.gateway }}
 {%   endif %}
-{#   TODO: dev, table, options #}
+{#   TODO: dev, table #}
+{%   if route_options | length %}
+route{{ loop.index }}_options={{ route_options | join(',') }}
+{%   endif %}
 {% endfor %}
 {% if item.dnsnameservers is defined %}
 dns={{ item.dnsnameservers | join(',') }}
