@@ -106,6 +106,12 @@
 # argument to "ifup/ifdown" will only be effective for interfaces marked with
 # "auto". Interfaces marked with "allow-hotplug" will simply be ignored then.
 #
+# Note on Network Manager Bounce mechanism:
+#
+# 'nmcli connection up' works asynchronously so we need to check if interfaces
+# are truly up, as gathering facts in next step would fail due to inactive
+# state. Running another loop to check that.
+# Dummy interfaces can have UNKNOWN state.
 
 - name: Bounce networkmanager devices
   become: true
@@ -124,6 +130,31 @@
       returncode=1
     fi;
     {% endfor %}
+
+    echo 'Waiting for interfaces to become active and have a connected carrier';
+    for i in {1..20}; do
+      all_connected=true
+      {% for interface in all_interfaces_changed %}
+      if [[ '{{ interface }}' == *dummy* ]]; then
+        allowed_states='UNKNOWN|UP'
+      else
+        allowed_states='UP'
+      fi
+
+      if ! (nmcli -t -f DEVICE,STATE device status | grep -q -w '{{ interface }}:connected' && ip link show '{{ interface }}' | grep -q -E 'state ('$allowed_states')'); then
+        all_connected=false
+        if [ $i -eq 20 ]; then
+          echo 'Interface {{ interface }} failed to become active and have a connected carrier';
+          returncode=1
+        fi
+      fi;
+      {% endfor %}
+
+      if $all_connected; then
+        break;
+      fi
+      sleep 2;
+    done
 
     exit $returncode"
   vars:
