@@ -57,8 +57,11 @@ method=disabled
 {%   endfor %}
 {#   TODO: dev #}
 {%   if 'gateway' in route %}
-route{{ loop.index }}={{ (route.network ~'/'~ route.netmask) | ipaddr('network/prefix') }},{{ route.gateway }}
+{%     set route_string = (route.network ~'/'~ route.netmask) | ipaddr('network/prefix') ~ ',' ~ route.gateway %}
+{%   else %}
+{%     set route_string = (route.network ~'/'~ route.netmask) | ipaddr('network/prefix') %}
 {%   endif %}
+route{{ loop.index }}={{ route_string }}
 {%   if 'table' in route %}
 {#     networkmanager wants a table id, so we need to find it in interfaces_route_tables #}
 {%     set table_id = (interfaces_route_tables | selectattr('name', 'equalto', route.table) | first).id %}
