@@ -57,10 +57,12 @@ method=disabled
 {% endif %}
 {% for route in item.route | default([]) %}
 {%   set route_options = [] %}
-{%   for option in route.options | default([]) %}
+{#       Ignoring dev option - needed in Network Scripts  #}
+{#       as it is not needed in Network Manager           #}
+{%   for option in route.options | default([]) | reject('match', '^dev ') %}
 {%     if option is mapping %}
 {#       We're gonna assume it's a mapping of one key with value, and     #}
-{#       since dict2items returns a array, we're selecting the first item #}
+{#       since dict2items returns an array, we're selecting the first item #}
 {%       set option = option | dict2items | first %}
 {%       set _ = route_options.append(option.key ~ '=' ~ option.value) %}
 {%     elif option in ['onlink', 'lock-window', 'lock-cwdn', 'lock-mtu'] %}
@@ -69,7 +71,6 @@ method=disabled
 {%       set _ = route_options.append(option) %}
 {%     endif %}
 {%   endfor %}
-{#   TODO: dev #}
 {%   if 'gateway' in route %}
 {%     set route_string = (route.network ~'/'~ route.netmask) | ipaddr('network/prefix') ~ ',' ~ route.gateway %}
 {%   else %}
