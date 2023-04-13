@@ -15,8 +15,9 @@
 - name: Create the network configuration file for ethernet devices
   become: true
   template:
-    src: 'ethernet_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/ifcfg-{{ item.device }}'
+    src: "ethernet_{{ interfaces_use_nmconnection | ternary('nmconnection', ansible_facts.os_family) }}.j2"
+    dest: "{{ interfaces_net_path }}/{{ interfaces_use_nmconnection | ternary(item.device ~ '.nmconnection', 'ifcfg-' ~ item.device) }}"
+    mode: "{{ interfaces_use_nmconnection | ternary('0600', omit) }}"
   with_items: '{{ interfaces_ether_interfaces }}'
   register: ether_result
   notify:
@@ -26,9 +27,12 @@
   become: true
   template:
     src: 'route_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/route-{{ item.device }}'
+    dest: '{{ interfaces_net_path }}/route-{{ item.device }}'
   with_items: '{{ interfaces_ether_interfaces }}'
-  when: item.route is defined and ansible_facts.os_family == 'RedHat'
+  when:
+    - item.route is defined
+    - ansible_facts.os_family == 'RedHat'
+    - not interfaces_use_nmconnection
   register: ether_route_add_result
   notify:
     - Bounce network devices
@@ -37,9 +41,13 @@
   become: true
   template:
     src: 'route6_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/route6-{{ item.device }}'
+    dest: '{{ interfaces_net_path }}/route6-{{ item.device }}'
   with_items: '{{ interfaces_ether_interfaces }}'
-  when: item.ip6 is defined and item.ip6.route is defined and ansible_facts.os_family == 'RedHat'
+  when:
+    - item.ip6 is defined
+    - item.ip6.route is defined
+    - ansible_facts.os_family == 'RedHat'
+    - not interfaces_use_nmconnection
   register: ether_route6_add_result
   notify:
     - Bounce network devices
@@ -47,10 +55,12 @@
 - name: RedHat | Remove configuration files for rhel route configuration
   become: true
   file:
-    path: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/route-{{ item.device }}'
+    path: '/etc/sysconfig/network-scripts/route-{{ item.device }}'
     state: absent
   with_items: '{{ interfaces_ether_interfaces }}'
-  when: item.route is not defined and ansible_facts.os_family == 'RedHat'
+  when:
+    - item.route is not defined or interfaces_use_nmconnection
+    - ansible_facts.os_family == 'RedHat'
   register: ether_route_del_result
   notify:
     - Bounce network devices
@@ -58,10 +68,12 @@
 - name: RedHat | Remove configuration files for rhel v6 route configuration
   become: true
   file:
-    path: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/route6-{{ item.device }}'
+    path: '/etc/sysconfig/network-scripts/route6-{{ item.device }}'
     state: absent
   with_items: '{{ interfaces_ether_interfaces }}'
-  when: item.ip6 is not defined and ansible_facts.os_family == 'RedHat'
+  when:
+    - item.ip6 is not defined or interfaces_use_nmconnection
+    - ansible_facts.os_family == 'RedHat'
   register: ether_route6_del_result
   notify:
     - Bounce network devices
@@ -70,9 +82,12 @@
   become: true
   template:
     src: 'rule_{{ ansible_facts.os_family }}.j2'
-    dest: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/rule-{{ item.device }}'
+    dest: '{{ interfaces_net_path }}/rule-{{ item.device }}'
   with_items: '{{ interfaces_ether_interfaces }}'
-  when: item.rules is defined and ansible_facts.os_family == 'RedHat'
+  when:
+    - item.rules is defined
+    - ansible_facts.os_family == 'RedHat'
+    - not interfaces_use_nmconnection
   register: ether_rule_add_result
   notify:
     - Bounce network devices
@@ -80,10 +95,12 @@
 - name: RedHat | Remove configuration files for rhel rule configuration
   become: true
   file:
-    path: '{{ interfaces_net_path[ansible_facts.os_family|lower] }}/rule-{{ item.device }}'
+    path: '/etc/sysconfig/network-scripts/rule-{{ item.device }}'
     state: absent
   with_items: '{{ interfaces_ether_interfaces }}'
-  when: item.rules is not defined and ansible_facts.os_family == 'RedHat'
+  when:
+    - item.rules is not defined or interfaces_use_nmconnection
+    - ansible_facts.os_family == 'RedHat'
   register: ether_rule_del_result
   notify:
     - Bounce network devices

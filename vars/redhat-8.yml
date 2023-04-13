@@ -1,0 +1,8 @@
+---
+interfaces_pkgs:
+  - dhcp-client
+  - iproute
+  - iputils
+  - network-scripts
+
+interfaces_net_path: "{{ interfaces_use_nmconnection | ternary('/etc/NetworkManager/system-connections', '/etc/sysconfig/network-scripts') }}"

@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+
+[connection]
+id={{ item.1 }}
+type={{ (item.1 is match(dummy_interface_regex)) | ternary('dummy', 'ethernet') }}
+interface-name={{ item.1 }}
+
+master={{ item.0.device }}
+slave-type=bond

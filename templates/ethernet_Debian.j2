@@ -53,9 +53,12 @@ wpa-conf {{ item.wpaconf }}
 {% if 'table' in i %}
 {% set route = route ~ ' table ' ~ i.table %}
 {% endif %}
-{% if 'options' in i %}
-{% set route = route ~ ' ' ~ i.options | join(' ') %}
-{% endif %}
+{% for option in i.options | default([]) %}
+{%   if option is mapping %}
+{%     set option = (option | dict2items | first).key %}
+{%   endif %}
+{%   set route = route ~ ' ' ~ option %}
+{% endfor %}
 up ip route add {{ route }}
 down ip route del {{ route }}
 {% endfor %}
@@ -86,8 +89,7 @@ gateway {{ item.ip6.gateway }}
 {% endif %}
 {% if item.ip6 is defined %}
 
-{% if item.ip6.route is defined %}
-{% for i in item.ip6.route %}
+{% for i in item.ip6.route | default([]) %}
 {% set route = i.network %}
 {% if 'gateway' in i %}
 {% set route = route ~ ' via ' ~ i.gateway %}
@@ -97,11 +99,13 @@ gateway {{ item.ip6.gateway }}
 {% if 'table' in i %}
 {% set route = route ~ ' table ' ~ i.table %}
 {% endif %}
-{% if 'options' in i %}
-{% set route = route ~ ' ' ~ i.options | join(' ') %}
-{% endif %}
+{% for option in i.options | default([]) %}
+{%   if option is mapping %}
+{%     set option = (option | dict2items | first).key %}
+{%   endif %}
+{%   set route = route ~ ' ' ~ option %}
+{% endfor %}
 up ip -6 route add {{ route }}
 down ip -6 route del {{ route }}
 {% endfor %}
-{% endif %}
 {% endif %}

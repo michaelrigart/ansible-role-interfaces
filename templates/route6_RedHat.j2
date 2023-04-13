@@ -1,8 +1,7 @@
 # {{ ansible_managed }}
 
 {% if item.ip6 is defined %}
-{% if item.ip6.route is defined %}
-{% for i in item.ip6.route %}
+{% for i in item.ip6.route | default([]) %}
 {% set route = i.network %}
 {% if 'gateway' in i %}
 {% set route = route ~ ' via ' ~ i.gateway %}
@@ -12,10 +11,12 @@
 {% if 'table' in i %}
 {% set route = route ~ ' table ' ~ i.table %}
 {% endif %}
-{% if 'options' in i %}
-{% set route = route ~ ' ' ~ i.options | join(' ') %}
-{% endif %}
+{% for option in i.options | default([]) %}
+{%   if option is mapping %}
+{%     set option = (option | dict2items | first).key %}
+{%   endif %}
+{%   set route = route ~ ' ' ~ option %}
+{% endfor %}
 {{ route }}
 {% endfor %}
-{% endif %}
 {% endif %}

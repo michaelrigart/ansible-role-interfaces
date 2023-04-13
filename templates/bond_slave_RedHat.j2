@@ -1,5 +1,6 @@
 # {{ ansible_managed }}
 
+NAME={{ item.1 }}
 DEVICE={{ item.1 }}
 BOOTPROTO=none
 MASTER={{ item.0.device }}
@@ -16,5 +17,5 @@ VLAN=yes
 {% endif %}
 
 {% if ansible_facts.distribution_major_version | int >= 7 %}
-NM_CONTROLLED=no
+NM_CONTROLLED={{ interfaces_use_networkmanager | ternary('yes', 'no') }}
 {% endif %}

@@ -106,6 +106,88 @@
 # argument to "ifup/ifdown" will only be effective for interfaces marked with
 # "auto". Interfaces marked with "allow-hotplug" will simply be ignored then.
 #
+# Note on Network Manager Bounce mechanism:
+#
+# 'nmcli connection up' works asynchronously so we need to check if interfaces
+# are truly up, as gathering facts in next step would fail due to inactive
+# state. Running another loop to check that.
+# Dummy interfaces can have UNKNOWN state.
+
+- name: Bounce networkmanager devices
+  become: true
+  command: >
+    nohup bash -c "
+    nmcli connection reload;
+
+    returncode=0
+    {% for interface in all_interfaces_changed | reverse %}
+    nmcli connection down {{ interface }};
+    {% endfor %}
+
+    {% for interface in all_interfaces_changed %}
+    if ! nmcli connection up {{ interface }}; then
+      echo \"Failed to bring up interface {{ interface }}\";
+      returncode=1
+    fi;
+    {% endfor %}
+
+    echo 'Waiting for interfaces to become active and have a connected carrier';
+    for i in {1..20}; do
+      all_connected=true
+      {% for interface in all_interfaces_changed %}
+      if [[ '{{ interface }}' == *dummy* ]]; then
+        allowed_states='UNKNOWN|UP'
+      else
+        allowed_states='UP'
+      fi
+
+      if ! (nmcli -t -f DEVICE,STATE device status | grep -q -w '{{ interface }}:connected' && ip link show '{{ interface }}' | grep -q -E 'state ('$allowed_states')'); then
+        all_connected=false
+        if [ $i -eq 20 ]; then
+          echo 'Interface {{ interface }} failed to become active and have a connected carrier';
+          returncode=1
+        fi
+      fi;
+      {% endfor %}
+
+      if $all_connected; then
+        break;
+      fi
+      sleep 2;
+    done
+
+    exit $returncode"
+  vars:
+    ether_vlan_interfaces_changed: >
+      {{ ether_interfaces_changed | select('match', vlan_interface_regex) | list}}
+    ether_non_vlan_interfaces_changed: >
+      {{ ether_interfaces_changed | reject('match', vlan_interface_regex) | list }}
+    bridge_port_vlan_interfaces_changed: >
+      {{ bridge_port_interfaces_changed | select('match', vlan_interface_regex) | list}}
+    bridge_port_non_vlan_interfaces_changed: >
+      {{ bridge_port_interfaces_changed | reject('match', vlan_interface_regex) | list }}
+    all_interfaces_changed: >
+        {{ ether_non_vlan_interfaces_changed +
+           bridge_interfaces_changed +
+           bond_master_interfaces_changed +
+           bridge_port_interfaces_changed +
+           bond_slave_interfaces_changed +
+           ether_vlan_interfaces_changed }}
+  listen: Bounce network devices
+  when: interfaces_use_networkmanager
+  notify:
+    - Gather facts
+    - Check active Ethernet interface state
+    - Check active bond interface state
+    - Check active bridge interface state
+
+# The order handlers execute are based on the order they're arranged here.
+# We want to do a controlled bounce of interfaces before we do any restart.
+- name: Restart NetworkManager
+  become: true
+  service:
+    name: NetworkManager
+    state: restarted
 
 - name: Bounce network devices
   become: true
@@ -153,6 +235,7 @@
            ether_vlan_interfaces_changed +
            bond_master_interfaces_changed }}
     all_interfaces_changed: "{{ all_interfaces_changed_map[ansible_facts.os_family] }}"
+  when: not interfaces_use_networkmanager
   notify:
     - Pause to wait for interfaces to become active
     - Gather facts

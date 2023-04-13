@@ -1,0 +1,8 @@
+---
+interfaces_pkgs:
+  - bridge-utils
+  - iproute
+  - iputils
+  - libselinux-python
+
+interfaces_net_path: /etc/sysconfig/network-scripts

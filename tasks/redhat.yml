@@ -2,9 +2,22 @@
 - name: RedHat | install current/latest network packages versions
   become: true
   package:
-    name: '{{  interfaces_pkgs["redhat"][ansible_facts.distribution_major_version] }}'
+    name: '{{  interfaces_pkgs }}'
     state: '{{ interfaces_pkg_state }}'
   tags: package
+  when: not interfaces_use_networkmanager
+
+- name: RedHat | install NM-dispatcher-routing-rules
+  become: true
+  package:
+    name: NetworkManager-dispatcher-routing-rules
+    state: '{{ interfaces_pkg_state }}'
+  tags: package
+  when:
+    - interfaces_use_networkmanager
+    - not interfaces_use_nmconnection
+    - interfaces_route_tables | length > 0
+  notify: Restart NetworkManager
 
 # CentOS 8 cloud images ship with ifcfg files for ens3 and eth0. ifcfg-ens3
 # seems to be a relic from the image build process, and causes the network
@@ -26,3 +39,20 @@
     - item not in interfaces_bond_interfaces | map(attribute='device') | list
     - item not in interfaces_bond_interfaces | map(attribute='bond_slaves') | flatten | list
   with_items: "{{ interfaces_workaround_centos_remove }}"
+
+# When using NetworkManager with system-connections store, existing ifcfg files
+# need to be removed, otherwise they shadow our nmconnection files. We do this
+# only for interfaces that we manage in this role.
+- name: RedHat | remove network-scripts/ifcfg configuration for NM/system-connections
+  become: true
+  file:
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ item }}"
+    state: absent
+  when:
+    - interfaces_use_nmconnection
+  with_items:
+    - "{{ interfaces_ether_interfaces | map(attribute='device') | list }}"
+    - "{{ interfaces_bridge_interfaces | map(attribute='device') | list }}"
+    - "{{ interfaces_bridge_interfaces | map(attribute='ports') | flatten | list }}"
+    - "{{ interfaces_bond_interfaces | map(attribute='device') | list }}"
+    - "{{ interfaces_bond_interfaces | map(attribute='bond_slaves') | flatten | list }}"
