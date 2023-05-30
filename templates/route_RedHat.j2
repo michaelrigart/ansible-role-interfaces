@@ -2,6 +2,7 @@
 
 {% for i in item.route | default([]) %}
 {# Workaround for Ansible bug https://github.com/ansible/ansible/issues/17872. #}
+{% if i is mapping %} {# If route is not a mapping, then assume it's a complete rule #}
 {% set prefix = ('0.0.0.0/' ~ i.netmask) | ipaddr('prefix') %}
 {% set route = i.network ~ '/' ~ prefix %}
 {% if 'gateway' in i %}
@@ -18,5 +19,8 @@
 {%   endif %}
 {%   set route = route ~ ' ' ~ option %}
 {% endfor %}
+{% else %}
+{% set route = i%}
+{% endif %}
 {{ route }}
 {% endfor %}
