@@ -455,6 +455,8 @@ bouncing network interfaces before they are active. This can be done by setting
 interfaces_route_tables:
     - name: frontend
       id: 200
+    - name: marktable
+      id: 100
 interfaces_ether_interfaces:
     - device: eth1
       bootproto: static
@@ -467,16 +469,11 @@ interfaces_ether_interfaces:
           network: 0.0.0.0
           netmask: 0.0.0.0
           gateway: 10.10.10.254
-        - "local 0.0.0.0/0 dev lo table 100"
+        - "local 0.0.0.0/0 dev lo table marktable"
       rules:
         - from: 10.10.10.1
           table: frontend
-        - "fwmark 1 lookup 100"
-```
-
-### host_vars/proxy2
-
-```yaml
+        - "fwmark 1 lookup marktable"
 ```
 
 Example Playbook
