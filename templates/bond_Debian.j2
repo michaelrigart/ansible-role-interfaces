@@ -86,7 +86,20 @@ down ip route del {{ route }}
 
 {%- if item.rules is defined %}
 {% for rule in item.rules %}
-up ip rule add {{ rule }}
-down ip rule del {{ rule }}
+{%   if rule is mapping %}
+{%     if rule.to is defined %}
+{%       set rule_str = 'to ' ~ rule.to %}
+{%     endif %}
+{%     if rule.from is defined %}
+{%       set rule_str = 'from ' ~ rule.from %}
+{%     endif %}
+{%     if rule.table is defined %}
+{%       set rule_str = rule_str ~ ' table' ~ rule.table %}
+{%     endif %}
+{%   else %}
+{%     set rule_str = rule %}
+{%   endif %}
+up ip rule add {{ rule_str }}
+down ip rule del {{ rule_str }}
 {% endfor %}
 {% endif %}
