@@ -62,31 +62,50 @@ bond-slaves none
 bond-slaves {{ item.bond_slaves|join(' ') }}
 {% endif %}
 
-{% for i in item.route | default([]) %}
+{% if item.route is defined %}
+{%   for i in item.route %}
 {# Workaround for Ansible bug https://github.com/ansible/ansible/issues/17872. #}
-{%   set prefix = ('0.0.0.0/' ~ i.netmask) | ipaddr('prefix') %}
-{%   set route = i.network ~ '/' ~ prefix %}
-{%   if 'gateway' in i %}
-{%     set route = route ~ ' via ' ~ i.gateway %}
-{%   else %}
-{%     set route = route ~ ' dev ' ~ item.device %}
-{%   endif %}
-{%   if 'table' in i %}
-{%     set route = route ~ ' table ' ~ i.table %}
-{%   endif %}
-{%   for option in i.options | default([]) %}
-{%     if option is mapping %}
-{%       set option = (option | dict2items | first).key %}
+{%     if i is mapping %} {# If route is not a mapping, then assume it's a complete rule #}
+{%       set prefix = ('0.0.0.0/' ~ i.netmask) | ipaddr('prefix') %}
+{%       set route = i.network ~ '/' ~ prefix %}
+{%       if 'gateway' in i %}
+{%         set route = route ~ ' via ' ~ i.gateway %}
+{%       else %}
+{%         set route = route ~ ' dev ' ~ item.device %}
+{%       endif %}
+{%       if 'table' in i %}
+{%         set route = route ~ ' table ' ~ i.table %}
+{%       endif %}
+{%       for option in i.options | default([]) %}
+{%         if option is mapping %}
+{%           set option = (option | dict2items | first).key %}
+{%         endif %}
+{%         set route = route ~ ' ' ~ option %}
+{%       endfor %}
+{%     else %}
+{%       set route = i %}
 {%     endif %}
-{%     set route = route ~ ' ' ~ option %}
-{%   endfor %}
 up ip route add {{ route }}
 down ip route del {{ route }}
-{% endfor %}
+{%   endfor %}
 
-{%- if item.rules is defined %}
+{% endif %}
+{% if item.rules is defined %}
 {% for rule in item.rules %}
-up ip rule add {{ rule }}
-down ip rule del {{ rule }}
+{%   if rule is mapping %}
+{%     if rule.to is defined %}
+{%       set rule_str = 'to ' ~ rule.to %}
+{%     endif %}
+{%     if rule.from is defined %}
+{%       set rule_str = 'from ' ~ rule.from %}
+{%     endif %}
+{%     if rule.table is defined %}
+{%       set rule_str = rule_str ~ ' table' ~ rule.table %}
+{%     endif %}
+{%   else %}
+{%     set rule_str = rule %}
+{%   endif %}
+up ip rule add {{ rule_str }}
+down ip rule del {{ rule_str }}
 {% endfor %}
 {% endif %}
