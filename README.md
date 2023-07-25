@@ -1,4 +1,4 @@
-Ansible Interfaces Role [![Build Status](https://travis-ci.org/michaelrigart/ansible-role-interfaces.svg?branch=master)](https://travis-ci.org/michaelrigart/ansible-role-interfaces)
+Ansible Interfaces Role
 =======================
 
 An ansible role for configuring different network interfaces.
