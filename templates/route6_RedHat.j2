@@ -11,12 +11,11 @@
 {% if 'table' in i %}
 {% set route = route ~ ' table ' ~ i.table %}
 {% endif %}
+{{ route -}}
 {% for option in i.options | default([]) %}
-{%   if option is mapping %}
-{%     set option = (option | dict2items | first).key %}
-{%   endif %}
-{%   set route = route ~ ' ' ~ option %}
+{% if option is mapping %}{% set option = (option | dict2items | first).key %}{% endif %}
+ {{ option -}}
 {% endfor %}
-{{ route }}
+
 {% endfor %}
 {% endif %}
