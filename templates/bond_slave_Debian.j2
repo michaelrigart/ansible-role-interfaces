@@ -4,6 +4,6 @@
 
 auto {{ item.1 }}
 iface {{ item.1 }} inet manual
-{% if ansible_facts.distribution_major_version | int < 11 %}
+{% if (ansible_facts.distribution_major_version | int < 11) or (ansible_facts.distribution == 'Ubuntu') %}
 bond-master {{ item.0.device }}
 {% endif %}
