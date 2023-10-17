@@ -89,6 +89,9 @@ routing-rule{{ loop.index }}=priority {{ 32765 - loop.index0 }} {{ rule }}
 {% if item.dnsnameservers is defined %}
 dns={{ item.dnsnameservers | join(',') }}
 {% endif %}
+{% if item.dnssearch is defined %}
+dns-search={{ item.dnssearch | join(',') }}
+{% endif %}
 
 [ipv6]
 {% if item.ip6 is defined %}
