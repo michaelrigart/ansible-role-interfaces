@@ -19,17 +19,31 @@
     - interfaces_route_tables | length > 0
   notify: Restart NetworkManager
 
-# CentOS 8 cloud images ship with ifcfg files for ens3 and eth0. ifcfg-ens3
+# CentOS 8/9 cloud images ship with ifcfg files for ens3 and eth0. ifcfg-ens3
 # seems to be a relic from the image build process, and causes the network
 # service to fail. ifcfg-eth0 is useful for most virtual machines, but if a
 # cloud image is deployed on bare metal and eth0 is absent, the network service
 # will fail. Remove these files if the interface does not exist or is not being
 # configured.
 
-- name: RedHat | remove invalid interface configuration
+- name: RedHat | network-scripts remove invalid interface configuration
   become: true
   file:
     path: "/etc/sysconfig/network-scripts/ifcfg-{{ item }}"
+    state: absent
+  when:
+    - item not in ansible_facts.interfaces
+    - item not in interfaces_ether_interfaces | map(attribute='device') | list
+    - item not in interfaces_bridge_interfaces | map(attribute='device') | list
+    - item not in interfaces_bridge_interfaces | map(attribute='ports') | flatten | list
+    - item not in interfaces_bond_interfaces | map(attribute='device') | list
+    - item not in interfaces_bond_interfaces | map(attribute='bond_slaves') | flatten | list
+  with_items: "{{ interfaces_workaround_centos_remove }}"
+
+- name: RedHat | network-manager remove invalid interface configuration
+  become: true
+  file:
+    path: "/etc/NetworkManager/system-connections/{{ item }}.nmconnection"
     state: absent
   when:
     - item not in ansible_facts.interfaces
