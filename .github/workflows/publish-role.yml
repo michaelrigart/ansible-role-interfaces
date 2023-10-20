@@ -6,7 +6,11 @@ name: Publish Ansible Role
       - "v?[0-9]+.[0-9]+.[0-9]+"
   workflow_dispatch:
 jobs:
-  publish_role:
-    uses: stackhpc/.github/.github/workflows/publish-role.yml@main
-    secrets:
-      GALAXY_API_KEY: ${{ secrets.GALAXY_API_KEY }}
+  galaxy:
+    runs-on: ubuntu-latest
+    name: Publish Ansible Role to Ansible Galaxy
+    steps:
+      # NOTE: The GitHub namespace is lower case, but the Galaxy namespace is upper case.
+      # Hard code to the Galaxy namespace.
+      - name: Publish Role 🚀
+        run: ansible-galaxy import MichaelRigart $(basename ${{ github.repository }}) --api-key ${{ secrets.GALAXY_API_KEY }} --branch ${{ github.ref_name }}
