@@ -13,4 +13,4 @@ jobs:
       # NOTE: The GitHub namespace is lower case, but the Galaxy namespace is upper case.
       # Hard code to the Galaxy namespace.
       - name: Publish Role 🚀
-        run: ansible-galaxy import MichaelRigart $(basename ${{ github.repository }}) --api-key ${{ secrets.GALAXY_API_KEY }}
+        run: ansible-galaxy import MichaelRigart $(basename ${{ github.repository }}) --api-key ${{ secrets.GALAXY_API_KEY }} --branch ${{ github.ref_name }}
