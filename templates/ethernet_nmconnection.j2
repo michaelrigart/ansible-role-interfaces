@@ -88,7 +88,7 @@ routing-rule{{ loop.index }}=priority {{ 32765 - loop.index0 }} {{ rule }}
 {% endfor %}
 {% if item.dnsnameservers is defined %}
 {% if item.dnsnameservers is iterable %}
-dns={{ item.dnsnameservers | join(',') }}
+dns={{ item.dnsnameservers | join(';') }};
 {% else %}
 dns={{ item.dnsnameservers }}
 {% endif %}
