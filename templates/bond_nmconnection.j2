@@ -106,11 +106,13 @@ dns={{ item.dnsnameservers | join(',') }}
 {% else %}
 dns={{ item.dnsnameservers }}
 {% endif %}
+{% endif %}
 {% if item.dnssearch is defined %}
 {% if item.dnssearch is mapping %}
 dns-search={{ item.dnssearch | join(';') }};
 {% else %}
 dns-search={{ item.dnssearch }}
+{% endif %}
 {% endif %}
 
 [ipv6]
