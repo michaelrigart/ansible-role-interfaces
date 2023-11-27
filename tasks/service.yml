@@ -13,3 +13,13 @@
   when:
     - ansible_facts.os_family == 'RedHat'
     - not interfaces_use_networkmanager
+
+- name: RedHat | ensure NetworkManager service is started and enabled
+  become: true
+  service:
+    name: NetworkManager
+    enabled: true
+    state: started
+  when:
+    - ansible_facts.os_family == 'RedHat'
+    - interfaces_use_networkmanager
