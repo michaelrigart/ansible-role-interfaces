@@ -76,12 +76,13 @@ def _interface_check(context, interface, interface_type=None):
             if not fact_address:
                 if not secondaries:
                     return _fail("Interface %s has no IPv4 address" % device)
-                else:
-                    for address_dict in secondaries:
-                        if interface['address'] == address_dict['address']:
-                            fact['ipv4'] = address_dict
-                            fact_address = address_dict['address']
-                            break
+
+            if secondaries:
+                for address_dict in secondaries:
+                    if interface['address'] == address_dict['address']:
+                        fact['ipv4'] = address_dict
+                        fact_address = address_dict['address']
+
             if fact_address != interface["address"]:
                 return _fail("Interface %s has incorrect IPv4 address" % device)
 
