@@ -25,6 +25,12 @@ mtu={{ item.mtu }}
 interface-name={{ item.device }}
 parent={{ item.device | regex_replace(vlan_interface_regex, '\g<interface>') }}
 id={{ item.device | regex_replace(vlan_interface_regex, '\g<vlan_id>') }}
+{% if item.ingress_priority_map is defined %}
+ingress-priority-map={{ item.ingress_priority_map }}
+{% endif %}
+{% if item.egress_priority_map is defined %}
+egress-priority-map={{ item.egress_priority_map }}
+{% endif %}
 {% endif %}
 
 [ipv4]
