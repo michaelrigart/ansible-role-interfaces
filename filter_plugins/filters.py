@@ -58,7 +58,7 @@ def _interface_check(context, interface, interface_type=None):
     # secondary IP addresses on another interface.
     if ':' not in device:
         # State
-        if not fact.get("active"):
+        if not fact.get("active") and not bool(interface.get("ignore_status_check")):
             return _fail("Interface %s is not active" % device)
 
         # Type
