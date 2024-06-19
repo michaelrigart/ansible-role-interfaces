@@ -137,6 +137,8 @@
       {% for interface in all_interfaces_changed %}
       if [[ '{{ interface }}' == *dummy* ]]; then
         allowed_states='UNKNOWN|UP'
+      elif [[ '{{ interface }}' == 'lo' ]]; then
+        allowed_states='UNKNOWN'
       else
         allowed_states='UP'
       fi
