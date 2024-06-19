@@ -446,7 +446,8 @@ bouncing network interfaces before they are active. This can be done by setting
 ```
 
 18) Routes and rules can be a mix of strings and hashes (a.k.a. dict, mapping, associative array, etc.) allowing
-    the role to handle rules and routes outside the expected formats.
+    the role to handle rules and routes outside the expected formats. These can also be applied to loopback devices in
+    distributions using Network Manager's new `nmconnect` configuration files (e.g. RHEL8 & RHEL9).
 
     The example below configures an interface, to act as a second interface so that any traffic that hits it is returned via the same interface. In addition internal traffic is marked so it can be picked up by some other service (like HAproxy).
 
@@ -469,11 +470,19 @@ interfaces_ether_interfaces:
           network: 0.0.0.0
           netmask: 0.0.0.0
           gateway: 10.10.10.254
-        - "local 0.0.0.0/0 dev lo table marktable"
       rules:
         - from: 10.10.10.1
           table: frontend
         - "fwmark 1 lookup marktable"
+    - device: lo
+      type: loopback
+      # Setting bootproto to dhcp is required to set `method=auto` in the nmconnect file
+      bootproto: dhcp
+      route:
+        - table: marktable
+          device: lo
+          network: 0.0.0.0
+          netmask: 0
 ```
 
 Example Playbook
