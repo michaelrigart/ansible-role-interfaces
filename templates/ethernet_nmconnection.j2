@@ -31,6 +31,12 @@ parent={{ item.device | regex_replace(vlan_interface_regex, '\g<interface>') }}
 id={{ item.device | regex_replace(vlan_interface_regex, '\g<vlan_id>') }}
 {% endif %}
 
+{% if 'type' in item %}
+{% if item.type == 'loopback' %}
+[loopback]
+
+{% endif %}
+{% endif %}
 [ipv4]
 {% if item.bootproto == 'dhcp' %}
 method=auto
