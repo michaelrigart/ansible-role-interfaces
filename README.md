@@ -477,12 +477,15 @@ interfaces_ether_interfaces:
     - device: lo
       type: loopback
       # Setting bootproto to dhcp is required to set `method=auto` in the nmconnect file
+      # This replicates `ip route add local 0.0.0.0/0 dev lo table 100"`
       bootproto: dhcp
       route:
         - table: marktable
           device: lo
           network: 0.0.0.0
           netmask: 0
+          options:
+            - type: local
 ```
 
 Example Playbook
