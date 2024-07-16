@@ -102,20 +102,20 @@ def _interface_check(context, interface, interface_type=None):
         elif fact_address and fact_address not in interface.get('allowed_addresses', []):
             return _fail("Interface %s has an IPv4 address but none was "
                          "requested" % device)
-    
+
     # Static IPv6 address
     if interface.get("bootproto") == "static" and interface.get("ip6"):
         fact_address = fact.get("ipv6", [])
         # IP address
         if len(fact_address) == 0:
             return _fail("Interface %s has no IPv6 address" % device)
-        
+
         for item in fact_address:
             if item["address"] == interface["ip6"]["address"] and item["prefix"] == str(interface["ip6"]["prefix"]):
                 break
         else:
             return _fail("Interface %s has incorrect IPv6 address" % device)
-        
+
         # Gateway
         if interface["ip6"].get("gateway"):
             fact_gateway = context["ansible_facts"].get("default_ipv6", {}).get("gateway")
@@ -143,6 +143,8 @@ def ether_check(context, interface):
     """
     if interface.get('type') == 'ipoib':
         result = _interface_check(context, interface, "infiniband")
+    elif interface.get('type') == 'loopback':
+        result = _interface_check(context, interface, "loopback")
     else:
         result = _interface_check(context, interface, "ether")
     return result

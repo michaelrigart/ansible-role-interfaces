@@ -2,7 +2,11 @@
 
 [connection]
 id={{ item.device }}
+{% if 'type' in item %}
+type={{ item.type }}
+{% else %}
 type={{ ('vlan' if item.device is match(vlan_interface_regex) else 'dummy' if item.device is match(dummy_interface_regex) else 'ethernet') }}
+{% endif %}
 interface-name={{ item.device }}
 {% if item.zone is defined %}
 zone={{ item.zone }}
@@ -33,6 +37,12 @@ egress-priority-map={{ item.egress_priority_map }}
 {% endif %}
 {% endif %}
 
+{% if 'type' in item %}
+{% if item.type == 'loopback' %}
+[loopback]
+
+{% endif %}
+{% endif %}
 [ipv4]
 {% if item.bootproto == 'dhcp' %}
 method=auto
