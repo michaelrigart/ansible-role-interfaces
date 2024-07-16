@@ -42,6 +42,11 @@ interfaces_setup_gather_subset: "{{ omit }}"
 # An option to merge all configurations setup with merge: true
 # in the global interfaces file (Debian-Family only)
 interfaces_merge: false
+
+# An option that does not fail interfaces bounce action when an
+# error has occured - useful when you assume one of the interfaces
+# to not have proper state.
+interfaces_bounce_ignore_errors: false
 ```
 
 Note: The values for the list are listed in the examples below.

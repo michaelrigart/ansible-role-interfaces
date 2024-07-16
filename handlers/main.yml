@@ -127,7 +127,9 @@
     {% for interface in all_interfaces_changed %}
     if ! nmcli connection up {{ interface }}; then
       echo \"Failed to bring up interface {{ interface }}\";
+      {% if interfaces_bounce_ignore_errors | bool %}
       returncode=1
+      {% endif %}
     fi;
     {% endfor %}
 
@@ -145,7 +147,9 @@
         all_connected=false
         if [ $i -eq 20 ]; then
           echo 'Interface {{ interface }} failed to become active and have a connected carrier';
+          {% if interfaces_bounce_ignore_errors | bool %}
           returncode=1
+          {% endif %}
         fi
       fi;
       {% endfor %}
@@ -201,7 +205,9 @@
     {% for interface in all_interfaces_changed %}
     if ! ifup {% if ansible_facts.os_family == 'Debian' %}--allow auto {% endif %}{{ interface }}; then
       echo \"Failed to bring up interface {{ interface }}\";
+      {% if interfaces_bounce_ignore_errors | bool %}
       returncode=1
+      {% endif %}
     fi;
     {% endfor %}
 
