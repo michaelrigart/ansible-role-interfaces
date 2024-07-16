@@ -44,6 +44,12 @@ NM_CONTROLLED={{ interfaces_use_networkmanager | ternary('yes', 'no') }}
 {% if item.device is match(vlan_interface_regex) %}
 VLAN=yes
 {% endif %}
+{% if item.ingress_priority_map is defined %}
+VLAN_INGRESS_PRIORITY_MAP={{ item.ingress_priority_map }}
+{% endif %}
+{% if item.egress_priority_map is defined %}
+VLAN_EGRESS_PRIORITY_MAP={{ item.egress_priority_map }}
+{% endif %}
 {% if item.mtu is defined %}
 MTU={{ item.mtu }}
 {% endif %}
