@@ -20,6 +20,9 @@ netmask {{ item.netmask }}
 {% if item.gateway is defined %}
 gateway {{ item.gateway }}
 {% endif %}
+{% if item.dnsnameservers is defined %}
+dns-nameservers {{ item.dnsnameservers }}
+{% endif %}
 {% endif %}
 {% if item.mtu is defined %}
 mtu {{ item.mtu }}
@@ -29,6 +32,9 @@ hwaddress {{ item.hwaddr }}
 {% endif %}
 {% if item.pre_up is defined %}
 pre-up {{ item.pre_up }}
+{% endif %}
+{% if item.dnssearch is defined %}
+dns-search {{ item.dnssearch }}
 {% endif %}
 {% if item.ports is defined %}
 bridge_ports {{ item.ports|join(' ') }}{% if item.ports | default([], true) | length == 0 %}none{% endif %}
