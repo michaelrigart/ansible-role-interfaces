@@ -2,8 +2,9 @@
 
 [connection]
 id={{ item.device }}
-{% if 'type' in item %}
-type={{ item.type }}
+{% if 'type' in item  %}
+{%- set type_map = {'ipoib': 'infiniband'} -%}
+type={{ type_map[item.type] | default(item.type) }}
 {% else %}
 type={{ ('vlan' if item.device is match(vlan_interface_regex) else 'dummy' if item.device is match(dummy_interface_regex) else 'ethernet') }}
 {% endif %}
@@ -22,6 +23,11 @@ slave-type=bridge
 {% if item.mtu is defined %}
 [ethernet]
 mtu={{ item.mtu }}
+{% endif %}
+
+{% if item.type | default('ethernet')  == 'ipoib' %}
+[infiniband]
+transport-mode=datagram
 {% endif %}
 
 {% if item.device is match(vlan_interface_regex) %}
