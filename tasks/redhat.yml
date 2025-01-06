@@ -26,7 +26,7 @@
       [connection]
       connection.autoconnect-slaves=1
     dest: /etc/NetworkManager/conf.d/80-rigart-interfaces.conf
-  notify: Restart NetworkManager
+  notify: Reload NetworkManager
   become: true
 
 # CentOS 8/9 cloud images ship with ifcfg files for ens3 and eth0. ifcfg-ens3

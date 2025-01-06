@@ -195,6 +195,12 @@
     name: NetworkManager
     state: restarted
 
+- name: Reload NetworkManager
+  become: true
+  service:
+    name: NetworkManager
+    state: reloaded
+
 - name: Bounce network devices
   become: true
   command: >
