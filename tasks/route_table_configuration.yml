@@ -7,3 +7,4 @@
       {% for table in interfaces_route_tables %}
       {{ table.id }} {{ table.name }}
       {% endfor %}
+  when: interfaces_route_tables | length > 0
