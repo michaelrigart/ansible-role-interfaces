@@ -19,6 +19,16 @@
     - interfaces_route_tables | length > 0
   notify: Restart NetworkManager
 
+- name: RedHat | add MichaelRigart.interfaces network-manager config overrides
+  copy:
+    content: |
+      # Ansible managed
+      [connection]
+      connection.autoconnect-slaves=1
+    dest: /etc/NetworkManager/conf.d/80-rigart-interfaces.conf
+  notify: Reload NetworkManager
+  become: true
+
 # CentOS 8/9 cloud images ship with ifcfg files for ens3 and eth0. ifcfg-ens3
 # seems to be a relic from the image build process, and causes the network
 # service to fail. ifcfg-eth0 is useful for most virtual machines, but if a
