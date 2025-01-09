@@ -19,7 +19,7 @@
     - interfaces_route_tables | length > 0
   notify: Restart NetworkManager
 
-- name: RedHat | Add NetworkManager Custom Configuration
+- name: RedHat | add MichaelRigart.interfaces network-manager config overrides
   copy:
     content: |
       # Ansible managed

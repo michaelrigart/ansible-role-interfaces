@@ -195,6 +195,11 @@
     name: NetworkManager
     state: restarted
 
+# The Reload handler is intentionally placed after Restart so that we do not
+# attempt to reload configuration when a full restart is required. In that
+# scenario, this handler becomes a no-op as the Restart handler will have
+# already applied the changes. If no restart is required, then we can perform
+# a less disruptive reload only.
 - name: Reload NetworkManager
   become: true
   service:
