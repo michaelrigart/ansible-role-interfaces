@@ -29,9 +29,6 @@
   notify: Reload NetworkManager
   become: true
 
-- name: Flush Handlers
-  meta: flush_handlers
-
 # CentOS 8/9 cloud images ship with ifcfg files for ens3 and eth0. ifcfg-ens3
 # seems to be a relic from the image build process, and causes the network
 # service to fail. ifcfg-eth0 is useful for most virtual machines, but if a
@@ -100,3 +97,6 @@
     - "{{ interfaces_bridge_interfaces | map(attribute='ports') | flatten | list }}"
     - "{{ interfaces_bond_interfaces | map(attribute='device') | list }}"
     - "{{ interfaces_bond_interfaces | map(attribute='bond_slaves') | flatten | list }}"
+
+- name: Flush Handlers
+  meta: flush_handlers
