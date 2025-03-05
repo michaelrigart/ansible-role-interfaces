@@ -1,8 +1,21 @@
 ---
+- name: Ensure /etc/iproute2 directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/iproute2
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Ensure IP routing tables are defined
   become: true
   blockinfile:
+    create: true
     dest: /etc/iproute2/rt_tables
+    owner: root
+    group: root
+    mode: '0644'
     block: |
       {% for table in interfaces_route_tables %}
       {{ table.id }} {{ table.name }}
