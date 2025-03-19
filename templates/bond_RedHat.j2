@@ -18,7 +18,6 @@ NETMASK={{ item.netmask }}
 {% if item.gateway is defined %}
 GATEWAY={{ item.gateway }}
 {% endif %}
-{% endif %}
 {% if item.dnsnameservers is defined %}
 {% for dns_server in item.dnsnameservers.split(' ')[:2] %}
 DNS{{ loop.index }}={{ dns_server }}
