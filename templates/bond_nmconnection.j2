@@ -47,7 +47,7 @@ method=auto
 {% elif item.bootproto == 'static' and item.address is defined and item.address | length %}
 method=manual
 {%   if item.netmask is defined %}
-address1={{ (item.address ~'/'~ item.netmask) | ipaddr('host/prefix') }}
+address1={{ (item.address ~'/'~ item.netmask) | ansible.utils.ipaddr('host/prefix') }}
 {%   endif %}
 {%   if item.gateway is defined and item.gateway | length %}
 gateway={{ item.gateway }}
@@ -72,9 +72,9 @@ method=disabled
 {%     endif %}
 {%   endfor %}
 {%   if 'gateway' in route %}
-{%     set route_string = (route.network ~'/'~ route.netmask) | ipaddr('network/prefix') ~ ',' ~ route.gateway %}
+{%     set route_string = (route.network ~'/'~ route.netmask) | ansible.utils.ipaddr('network/prefix') ~ ',' ~ route.gateway %}
 {%   else %}
-{%     set route_string = (route.network ~'/'~ route.netmask) | ipaddr('network/prefix') %}
+{%     set route_string = (route.network ~'/'~ route.netmask) | ansible.utils.ipaddr('network/prefix') %}
 {%   endif %}
 route{{ loop.index }}={{ route_string }}
 {%   if 'table' in route %}
@@ -108,14 +108,14 @@ dns={{ item.dnsnameservers | join(',') }}
 {% if item.ip6 is defined %}
 method={{ (item.bootproto == 'static') | ternary('manual', 'auto') }}
 {%   if item.ip6.address is defined and item.ip6.netmask is defined %}
-address1={{ (item.ip6.address ~'/'~ item.ip6.netmask) | ipaddr('host/prefix') }}
+address1={{ (item.ip6.address ~'/'~ item.ip6.netmask) | ansible.utils.ipaddr('host/prefix') }}
 {%   endif %}
 {%   if item.ip6.gateway is defined %}
 gateway={{ item.ip6.gateway }}
 {%   endif %}
 {%   for route in item.ip6.route | default([]) %}
 {%     if 'gateway' in route %}
-route{{ loop.index }}={{ (route.network ~'/'~ route.netmask) | ipaddr('network/prefix') }},{{ route.gateway }}
+route{{ loop.index }}={{ (route.network ~'/'~ route.netmask) | ansible.utils.ipaddr('network/prefix') }},{{ route.gateway }}
 {%     endif %}
 {#     TODO: dev, table, options #}
 {%   endfor %}
