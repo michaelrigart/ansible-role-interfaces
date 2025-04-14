@@ -48,7 +48,7 @@ bridge-vlan-aware {{ item.vlan_aware }}
 {%   for i in item.route %}
 {# Workaround for Ansible bug https://github.com/ansible/ansible/issues/17872. #}
 {%     if i is mapping %} {# If route is not a mapping, then assume it's a complete rule #}
-{%       set prefix = ('0.0.0.0/' ~ i.netmask) | ipaddr('prefix') %}
+{%       set prefix = ('0.0.0.0/' ~ i.netmask) | ansible.utils.ipaddr('prefix') %}
 {%       set route = i.network ~ '/' ~ prefix %}
 {%       if 'gateway' in i %}
 {%         set route = route ~ ' via ' ~ i.gateway %}
