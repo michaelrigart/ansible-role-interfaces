@@ -1,6 +1,9 @@
 # {{ ansible_managed }}
 
 NAME={{ item.device }}
+{% if item.uuid is defined %}
+UUID={{ item.uuid }}
+{% endif %}
 DEVICE={{ item.device }}
 TYPE=Bond
 {% if item.hwaddr is defined %}
@@ -36,7 +39,7 @@ DEFROUTE={{ item.defroute | bool | ternary('yes', 'no') }}
 {% if item.onboot is defined %}
 ONBOOT={{ item.onboot | bool | ternary('yes', 'no') }}
 {% endif %}
-BONDING_OPTS="{% if item.bond_mode is defined %}mode={{ item.bond_mode }} {% endif %}{% if item.bond_ad_select is defined %}ad_select={{ item.bond_ad_select }} {% endif %}{% if item.bond_updelay is defined %}updelay={{ item.bond_updelay }} {% endif %}{% if item.bond_downdelay is defined %}downdelay={{ item.bond_downdelay }} {% endif %}{% if item.bond_xmit_hash_policy is defined %}xmit_hash_policy={{ item.bond_xmit_hash_policy }} {% endif %}{% if item.bond_lacp_rate is defined %}lacp_rate={{ item.bond_lacp_rate }} {% endif %}{% if item.bond_primary is defined %}primary={{ item.bond_primary }} {% endif %}miimon={{ item.bond_miimon|default(100) }}"
+BONDING_OPTS="{% if item.bond_mode is defined %}mode={{ item.bond_mode }} {% endif %}{% if item.bond_ad_select is defined %}ad_select={{ item.bond_ad_select }} {% endif %}{% if item.bond_updelay is defined %}updelay={{ item.bond_updelay }} {% endif %}{% if item.bond_downdelay is defined %}downdelay={{ item.bond_downdelay }} {% endif %}{% if item.bond_xmit_hash_policy is defined %}xmit_hash_policy={{ item.bond_xmit_hash_policy }} {% endif %}{% if item.bond_lacp_rate is defined %}lacp_rate={{ item.bond_lacp_rate }} {% endif %}{% if item.bond_primary is defined %}primary={{ item.bond_primary }} {% endif %}miimon={{ item.bond_miimon|default(100) }} {% if item.min_links is defined %}min_links={{ item.min_links }}"
 {% if ansible_facts.distribution_major_version | int >= 7 %}
 NM_CONTROLLED={{ interfaces_use_networkmanager | ternary('yes', 'no') }}
 {% endif %}

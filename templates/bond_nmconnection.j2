@@ -2,6 +2,9 @@
 
 [connection]
 id={{ item.device }}
+{% if item.uuid is defined %}
+uuid={{ item.uuid }}
+{% endif %}
 type=bond
 interface-name={{ item.device }}
 {% if item.zone is defined %}
@@ -39,6 +42,9 @@ updelay={{ item.bond_updelay }}
 {% endif %}
 {% if item.bond_xmit_hash_policy is defined %}
 xmit_hash_policy={{ item.bond_xmit_hash_policy }}
+{% endif %}
+{% if item.bond_min_links is defined %}
+min_links={{ item.bond_min_links }}
 {% endif %}
 
 [ipv4]
