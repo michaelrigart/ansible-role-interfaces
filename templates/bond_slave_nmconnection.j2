@@ -2,7 +2,11 @@
 
 [connection]
 id={{ item.1 }}
+{% if item.0.type == 'ipoib' %}
+type=infiniband
+{% else %}
 type={{ (item.1 is match(dummy_interface_regex)) | ternary('dummy', 'ethernet') }}
+{% endif %}
 interface-name={{ item.1 }}
 
 master={{ item.0.device }}

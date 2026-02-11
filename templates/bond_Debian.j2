@@ -20,6 +20,9 @@ netmask {{ item.netmask }}
 {% if item.gateway is defined %}
 gateway {{ item.gateway }}
 {% endif %}
+{% if item.dnsnameservers is defined %}
+dns-nameservers {{ item.dnsnameservers }}
+{% endif %}
 {% endif %}
 {% if item.mtu is defined %}
 mtu {{ item.mtu }}
