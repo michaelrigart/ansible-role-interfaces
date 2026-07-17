@@ -141,7 +141,7 @@ def ether_check(context, interface):
     :param interface: An item in interfaces_ether_interfaces.
     :returns: A dict containing 'diff' and 'reason' items.
     """
-    if interface.get('type') == 'ipoib':
+    if interface.get('type') in ('ipoib', 'infiniband'):
         result = _interface_check(context, interface, "infiniband")
     elif interface.get('type') == 'loopback':
         result = _interface_check(context, interface, "loopback")
