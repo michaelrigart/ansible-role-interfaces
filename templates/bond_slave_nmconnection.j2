@@ -21,7 +21,7 @@ mtu={{ item.0.mtu }}
 {% else %}
 {% if item.0.mtu is defined %}
 [ethernet]
-mtu={{ item.mtu }}
+mtu={{ item.0.mtu }}
 {% endif %}
 {% endif %}
 
