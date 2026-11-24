@@ -343,9 +343,9 @@ which should be a list.
                - metric 400
 ```
 
-12) Configure an IPoIB (infiniband) interface
+12) Configure an IPoIB / Infiniband interface
 
-Configuring an IPoIB interface is possible using `type: ipoib` when defining the interface.
+Configuring an Infiniband interface is possible using `type: infiniband` when defining the interface. `type: ipoib` is still accepted as an alias.
 
 **WARNING: You can configure the ip address and routes for an IPoIB interface but other functionalities like vlans are not supported in infiniband networks**
 
@@ -363,7 +363,7 @@ Configuring an IPoIB interface is possible using `type: ipoib` when defining the
           bootproto: static
           address: 10.10.1.10
           netmask: 255.255.255.0
-          type: ipoib
+          type: infiniband
 ```
 
 13) Configure ethtool options (RedHat-family only)

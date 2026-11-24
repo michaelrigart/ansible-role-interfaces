@@ -12,7 +12,7 @@ interface-name={{ item.1 }}
 controller={{ item.0.device }}
 port-type=bond
 
-{% if item.0.type | default('ethernet')  == 'ipoib' %}
+{% if item.0.type | default('ethernet') in ['ipoib', 'infiniband'] %}
 [infiniband]
 transport-mode=datagram
 {% if item.0.mtu is defined %}
