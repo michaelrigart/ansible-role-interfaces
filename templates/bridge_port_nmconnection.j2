@@ -10,7 +10,7 @@ port-type=bridge
 {% if item.0.type | default('ethernet')  == 'ipoib' %}
 [infiniband]
 transport-mode=datagram
-{% if item.mtu is defined %}
+{% if item.0.mtu is defined %}
 mtu={{ item.0.mtu }}
 {% endif %}
 {% else %}
