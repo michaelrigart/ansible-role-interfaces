@@ -50,6 +50,10 @@ interfaces_bounce_ignore_errors: false
 
 # Creates configuration files in `/etc/NetworkManager/conf.d`
 interfaces_networkmanager_configs: {}
+
+# The ifupdown implementation to install (Debian-Family only). Set to
+# ifupdown2 on hosts that require it, such as Proxmox VE.
+interfaces_ifupdown_package: ifupdown
 ```
 
 Note: The values for the list are listed in the examples below.
