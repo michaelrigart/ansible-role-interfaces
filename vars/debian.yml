@@ -2,7 +2,7 @@
 interfaces_pkgs:
   - bridge-utils
   - ifenslave
-  - ifupdown
+  - "{{ interfaces_ifupdown_package }}"
   - iproute2
   - python{% if ansible_facts.python.version.major >= 3 %}3{% endif %}-selinux
   - resolvconf
